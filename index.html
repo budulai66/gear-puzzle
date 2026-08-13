@@ -1,0 +1,2422 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gear Puzzle</title>
+
+    <!-- Шрифты для стимпанк-стиля -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #070711;
+            color: #eee;
+            font-family: Arial, sans-serif;
+            touch-action: manipulation;
+            overflow: hidden;
+        }
+
+        #startScreen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-image: url('start_bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: inset 0 0 0 2000px rgba(5, 3, 10, 0.6);
+            z-index: 1000;
+            padding: 20px;
+            overflow: hidden;
+            font-family: 'Cinzel', 'Orbitron', sans-serif;
+        }
+        #startScreen.hidden {
+            display: none;
+        }
+
+        .lang-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 2px;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            backdrop-filter: blur(4px);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+        .lang-btn {
+            border: none;
+            background: transparent;
+            color: #8888aa;
+            font-weight: 600;
+            font-size: 13px;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+        .lang-btn:hover {
+            color: #fff;
+        }
+        .lang-btn.active {
+            color: #ffd866;
+            background: rgba(255, 216, 102, 0.15);
+            box-shadow: 0 0 10px rgba(255, 216, 102, 0.05);
+        }
+        .lang-divider {
+            color: #555;
+            font-weight: 300;
+        }
+
+        .logo-gear {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            margin-bottom: 12px;
+            z-index: 2;
+            animation: spinLogo 18s linear infinite;
+        }
+        .logo-gear img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 0 30px rgba(255, 216, 102, 0.15));
+        }
+        @keyframes spinLogo {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .start-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(32px, 6vw, 52px);
+            font-weight: 700;
+            color: #ffd866;
+            text-shadow: 0 0 40px rgba(255, 216, 102, 0.15), 0 4px 10px rgba(0,0,0,0.9);
+            letter-spacing: 8px;
+            text-align: center;
+            z-index: 2;
+            margin-bottom: 4px;
+        }
+        .start-subtitle {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(12px, 2vw, 16px);
+            color: #ccccee;
+            letter-spacing: 8px;
+            text-align: center;
+            z-index: 2;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+            min-height: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            width: 100%;
+            max-width: 480px;
+            justify-content: center;
+            z-index: 2;
+            margin-top: auto;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        .start-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 28px;
+            border: 2px solid rgba(184, 115, 51, 0.5);
+            border-radius: 8px;
+            background: rgba(26, 22, 40, 0.65);
+            backdrop-filter: blur(4px);
+            color: #ccb888;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            user-select: none;
+            touch-action: manipulation;
+            flex: 1;
+            min-width: 120px;
+        }
+        .start-btn:hover {
+            transform: translateY(-3px);
+            border-color: #ffd866;
+            background: rgba(36, 32, 56, 0.8);
+            box-shadow: 0 8px 25px rgba(255, 216, 102, 0.15);
+        }
+        .start-btn:active {
+            transform: translateY(2px);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+        }
+
+        .start-footer {
+            position: absolute;
+            bottom: 10px;
+            padding: 3px 14px;
+            border: 1px solid rgba(255, 215, 0, 0.08);
+            border-radius: 3px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(2px);
+            color: #8888aa;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            opacity: 0.6;
+            z-index: 2;
+        }
+
+        #game {
+            width: min(460px, calc(100% - 24px));
+            padding: 16px;
+            border: 1px solid #30305a;
+            border-radius: 22px;
+            background: linear-gradient(#17172f, #0d0d1c);
+            display: none;
+        }
+        #game.active {
+            display: block;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 2px solid #29294f;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        #menuBtn {
+            background: none;
+            border: none;
+            color: #ffd866;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        #helpBtn {
+            background: none;
+            border: none;
+            color: #aaaaca;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        #helpBtn:hover {
+            border-color: #ffd866;
+            color: #ffd866;
+        }
+
+        .stats {
+            color: #aaaaca;
+            font-size: 11px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .stats b {
+            color: #fff;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .stat-item .icon {
+            font-size: 14px;
+        }
+
+        .wrap {
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            margin: 12px auto 6px;
+            border: 1px solid #292950;
+            border-radius: 18px;
+            background-image: url('start_bg.jpg');
+            background-size: cover;
+            background-position: center;
+            box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.55);
+            touch-action: none;
+            cursor: pointer;
+        }
+
+        #hintText {
+            padding: 6px;
+            border-radius: 8px;
+            background: #191936;
+            color: #aaaaca;
+            text-align: center;
+            font-size: 12px;
+            margin: 4px 0;
+        }
+        .cw {
+            color: #63e99b;
+        }
+        .ccw {
+            color: #ff8585;
+        }
+
+        #info {
+            min-height: 44px;
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 8px 0;
+            color: #aaaaca;
+            text-align: center;
+            line-height: 20px;
+            font-size: 13px;
+            scrollbar-width: thin;
+            scrollbar-color: #ffd866 transparent;
+        }
+        #info::-webkit-scrollbar {
+            width: 4px;
+        }
+        #info::-webkit-scrollbar-thumb {
+            background: #ffd866;
+            border-radius: 2px;
+        }
+
+        #buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        #buttons button {
+            border: 0;
+            border-radius: 12px;
+            padding: 14px 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.15s;
+            touch-action: manipulation;
+            user-select: none;
+            min-height: 52px;
+        }
+        #buttons button:active {
+            transform: scale(0.94);
+        }
+        #buttons button:disabled {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        #undo {
+            background: #5665a8;
+            color: #fff;
+        }
+        #reset {
+            background: #a93652;
+            color: #fff;
+        }
+        #hint {
+            background: #d99b35;
+            color: #191200;
+        }
+        #hint.empty {
+            background: #444;
+            color: #888;
+            opacity: 0.6;
+        }
+        #next {
+            background: #3dbb7a;
+            color: #07110a;
+        }
+
+        .win {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-content: center;
+            border-radius: 18px;
+            background: rgba(0, 0, 0, 0.8);
+            text-align: center;
+            z-index: 10;
+            font-size: 28px;
+            backdrop-filter: blur(4px);
+            padding: 20px;
+        }
+        .win small {
+            color: #ffd866;
+            font-size: 14px;
+            line-height: 22px;
+        }
+        .win .stars-row {
+            font-size: 32px;
+            margin: 6px 0;
+            min-height: 44px;
+        }
+        .win .stars-row .star {
+            display: inline-block;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .win .stars-row .star.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .coin {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at 30% 30%, #f7d875, #b8860b);
+            border: 2px solid #8b6914;
+            box-shadow: 
+                inset -3px -3px 8px rgba(0,0,0,0.5),
+                inset 3px 3px 8px rgba(255,215,0,0.3),
+                0 0 10px rgba(255,215,0,0.1);
+            position: relative;
+            vertical-align: middle;
+            margin: 0 2px;
+        }
+        .coin::after {
+            content: 'C';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: bold;
+            color: #8b6914;
+            text-shadow: 0 1px 1px rgba(255,215,0,0.3);
+            font-family: 'Cinzel', serif;
+        }
+        .coin-small {
+            width: 16px;
+            height: 16px;
+        }
+        .coin-small::after {
+            font-size: 8px;
+        }
+
+        #helpPanel {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1500;
+            backdrop-filter: blur(8px);
+            padding: 20px;
+            cursor: pointer;
+        }
+        #helpPanel.open {
+            display: flex;
+        }
+        #helpPanel .help-box {
+            width: min(500px, 100%);
+            max-height: 80vh;
+            padding: 24px;
+            border-radius: 18px;
+            background: #17172f;
+            border: 2px solid #ffd866;
+            box-shadow: 0 0 60px rgba(255, 216, 102, 0.08);
+            overflow-y: auto;
+            cursor: default;
+            position: relative;
+        }
+        #helpPanel .help-box .close-btn {
+            background: none !important;
+            color: #aaa !important;
+            font-size: 24px;
+            float: right;
+            padding: 0 8px !important;
+            min-height: auto !important;
+            border: none;
+            cursor: pointer;
+        }
+        #helpPanel .help-box .close-btn:hover {
+            color: #fff !important;
+        }
+        #helpPanel .help-box h2 {
+            color: #ffd866;
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            margin-bottom: 16px;
+            letter-spacing: 2px;
+        }
+        #helpPanel .help-box p {
+            color: #ccccee;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+        #helpPanel .help-box .help-section {
+            margin: 12px 0;
+            padding: 10px 14px;
+            background: #1a1a35;
+            border-radius: 10px;
+            border-left: 3px solid #ffd866;
+        }
+        #helpPanel .help-box .help-section .label {
+            color: #ffd866;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        #helpPanel .help-box .help-section ul {
+            list-style: none;
+            padding: 4px 0 0 16px;
+        }
+        #helpPanel .help-box .help-section ul li {
+            color: #aaaaca;
+            font-size: 13px;
+            line-height: 1.6;
+            position: relative;
+        }
+        #helpPanel .help-box .help-section ul li::before {
+            content: '•';
+            color: #ffd866;
+            position: absolute;
+            left: -14px;
+        }
+
+        #panel {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 500;
+            backdrop-filter: blur(8px);
+            padding: 16px;
+            overflow-y: auto;
+            cursor: pointer;
+        }
+        #panel.open {
+            display: flex;
+            cursor: default;
+        }
+
+        .box {
+            width: min(460px, 100%);
+            max-height: 90vh;
+            padding: 18px;
+            border-radius: 18px;
+            background: #17172f;
+            border: 2px solid #ffd866;
+            box-shadow: 0 0 60px rgba(255, 216, 102, 0.08);
+            overflow-y: auto;
+        }
+        .box h3 {
+            color: #ffd866;
+            margin: 14px 0 10px;
+            font-size: 18px;
+        }
+        .box button {
+            margin: 4px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: none;
+            background: #29294c;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            touch-action: manipulation;
+            font-size: 14px;
+            min-height: 44px;
+        }
+        .box button:active {
+            transform: scale(0.94);
+        }
+        .danger {
+            background: #a93652 !important;
+            color: #fff !important;
+        }
+        .close-btn {
+            background: none !important;
+            color: #aaa !important;
+            font-size: 22px;
+            float: right;
+            padding: 0 8px !important;
+            min-height: auto !important;
+        }
+        .close-btn:hover {
+            color: #fff !important;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            margin: 4px 0;
+            border-radius: 8px;
+            background: #222242;
+            flex-wrap: wrap;
+            gap: 4px;
+            font-size: 14px;
+        }
+        .row input[type="text"] {
+            background: #0d0d1c;
+            border: 1px solid #44446b;
+            border-radius: 6px;
+            padding: 8px 10px;
+            color: #fff;
+            width: 140px;
+            font-size: 14px;
+        }
+        .row input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: #ffd866;
+            cursor: pointer;
+        }
+        .row select {
+            background: #0d0d1c;
+            border: 1px solid #44446b;
+            border-radius: 6px;
+            padding: 8px 10px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .levels {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin: 10px 0;
+        }
+        .levels button {
+            font-size: 11px;
+            padding: 8px 2px;
+            border-radius: 8px;
+            min-height: 48px;
+            background: #222242;
+            color: #aaa;
+            word-break: break-word;
+            line-height: 1.2;
+            border: 1px solid transparent;
+        }
+        .levels button.completed {
+            background: #1a3a1a;
+            color: #fff;
+            border-color: #4caf50;
+        }
+        .levels button.completed.stars-3 {
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.12);
+        }
+        .levels button.completed.stars-2 {
+            border-color: #c0c0c0;
+        }
+        .levels button.completed.stars-1 {
+            border-color: #cd7f32;
+        }
+        .levels button.locked {
+            background: #111128;
+            color: #444;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .levels button.boss {
+            position: relative;
+        }
+        .levels button.boss::after {
+            content: "👾";
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            font-size: 14px;
+        }
+        .levels button.current {
+            border: 2px solid #ffd866;
+            box-shadow: 0 0 20px rgba(255, 216, 102, 0.15);
+        }
+
+        .stars-info {
+            background: #1a1a35;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 8px 0;
+            font-size: 13px;
+            border-left: 3px solid #ffd866;
+        }
+        .stars-info .star-row {
+            padding: 2px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stars-info .star-row .stars {
+            font-size: 18px;
+            min-width: 70px;
+        }
+
+        .shop-section {
+            background: #1a1a35;
+            padding: 12px;
+            border-radius: 10px;
+            margin: 8px 0;
+            border-left: 3px solid #4caf50;
+        }
+        .shop-section .coins-display {
+            font-size: 22px;
+            color: #ffd700;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .shop-section .shop-btn {
+            padding: 10px 16px;
+            font-size: 14px;
+            background: #29294c;
+            color: #fff;
+            margin: 4px;
+            border-radius: 10px;
+            border: none;
+            min-height: 48px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .shop-section .shop-btn:disabled {
+            opacity: 0.4;
+        }
+        .shop-section .shop-btn.buy-hint {
+            background: #d99b35;
+            color: #191200;
+        }
+        .shop-section .shop-btn.buy-hint3 {
+            background: #f0a030;
+            color: #191200;
+            border: 1px solid #ffd700;
+        }
+
+        @media(max-width:480px) {
+            #game { padding: 12px; }
+            .stats { font-size: 10px; gap: 4px; }
+            #buttons button { font-size: 13px; padding: 12px 6px; min-height: 48px; }
+            .box { padding: 14px; }
+            .levels { grid-template-columns: repeat(4, 1fr); }
+            .levels button { font-size: 10px; min-height: 42px; }
+        }
+
+        @media(max-width:380px) {
+            .stats { font-size: 9px; }
+            #buttons button { font-size: 11px; padding: 10px 4px; min-height: 42px; }
+        }
+
+        .solution {
+            font-size: 13px;
+            text-align: left;
+            padding: 4px 0;
+        }
+        .solution b {
+            color: #ffd866;
+        }
+        .solution .step-pending { color: #666; }
+        .solution .step-done { color: #63e99b; }
+        .solution .step-current { color: #ffd866; }
+        .solution .step-error { color: #ff8585; }
+        
+        .notification {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 12px;
+            background: rgba(26, 26, 58, 0.95);
+            border: 2px solid #ffd866;
+            color: #ffd866;
+            font-weight: bold;
+            z-index: 100;
+            animation: slideDown 0.4s ease-out;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            max-width: 80%;
+            font-size: 14px;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .notification.success {
+            border-color: #4caf50;
+            color: #4caf50;
+        }
+        .notification.error {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+
+        @media(max-width:480px) {
+            .notification {
+                top: 3%;
+                font-size: 12px;
+                padding: 6px 14px;
+                max-width: 90%;
+                white-space: normal;
+            }
+        }
+
+        @keyframes slideDown {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- НАЧАЛЬНЫЙ ЭКРАН -->
+<div id="startScreen">
+    <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="ru" id="langRuBtn">РУС</button>
+        <span class="lang-divider">|</span>
+        <button class="lang-btn" data-lang="en" id="langEnBtn">ENG</button>
+    </div>
+
+    <div class="logo-gear">
+        <img src="gear-flat.png" alt="Gear" id="logoImage">
+    </div>
+
+    <div class="start-title" id="startTitle">GEAR PUZZLE</div>
+    <div class="start-subtitle" id="startSubtitle">СОБЕРИ МЕХАНИЗМ</div>
+
+    <div class="button-group">
+        <button class="start-btn" id="startPlayBtn">
+            <span class="btn-text" id="playText">ИГРАТЬ</span>
+        </button>
+        <button class="start-btn" id="startSettingsBtn">
+            <span class="btn-text" id="settingsText">НАСТРОЙКИ</span>
+        </button>
+        <button class="start-btn" id="startTutorialBtn">
+            <span class="btn-text" id="tutorialText">КАК ИГРАТЬ</span>
+        </button>
+    </div>
+
+    <div class="start-footer" id="startVersion">ВЕРСИЯ 1.0</div>
+</div>
+
+<!-- ИГРА -->
+<main id="game">
+    <header>
+        <div style="display:flex; gap:4px;">
+            <button id="menuBtn">⚙️</button>
+            <button id="helpBtn">?</button>
+        </div>
+        <span id="levelDisplay" style="color:#ffd866;font-weight:bold;font-size:16px;">
+            <span id="levelLabel">Уровень</span> <span id="level">1</span>
+        </span>
+        <span class="stats">
+            <span class="stat-item"><span class="icon">🔄</span><span id="movesLabel"></span><b id="moves">0</b></span>
+            <span class="stat-item"><span class="icon">⭐</span><span id="scoreLabel"></span><b id="score">1000</b></span>
+            <span class="stat-item"><span class="icon">🏆</span><span id="totalLabel"></span><b id="total">0</b></span>
+        </span>
+    </header>
+    <div class="wrap"><canvas id="canvas" width="400" height="400"></canvas></div>
+    <div id="hintText">👆 <span class="cw" id="hintCW">ПКМ / Правая половина — по часовой</span> | <span class="ccw" id="hintCCW">ЛКМ / Левая половина — против часовой</span></div>
+    <div id="info">👆 Нажми на шестерёнку</div>
+    <div id="buttons">
+        <button id="undo">Отмена</button>
+        <button id="reset">Сброс</button>
+        <button id="hint">Подсказка (5)</button>
+        <button id="next" disabled>Следующий</button>
+    </div>
+</main>
+
+<!-- МЕНЮ -->
+<div id="panel">
+    <div class="box">
+        <button class="close-btn" id="closePanel">✕</button>
+        <h3 id="menuTitle">⚙️ Меню</h3>
+        <div class="row"><span id="nameLabel">Имя:</span><input id="nameInput" maxlength="20" placeholder="Введите имя"></div>
+        <div class="row"><span id="playerLabel">Игрок:</span><span id="profileName">Механик</span></div>
+        <div class="row"><span id="scoreLabelM">Очки:</span><span id="profileTotalScore">0</span></div>
+        <div class="row"><span id="completedLabel">Уровней пройдено:</span><span id="profileCompleted">0 / 0</span></div>
+        <div class="row"><span id="starsLabelM">Звёзд:</span><span id="profileStars">0 / 0</span></div>
+        <div class="row"><span id="coinsLabelM">Монет:</span><span id="profileCoins" style="color:#ffd700;font-weight:bold;display:flex;align-items:center;gap:4px;">0 <span class="coin coin-small"></span></span></div>
+        <div class="row"><span id="soundLabel">Звук:</span><input id="soundToggle" type="checkbox" checked></div>
+        <div class="row"><span id="langLabel">Язык / Language:</span><select id="langSelect"><option value="ru">🇷🇺 Русский</option><option value="en">🇬🇧 English</option></select></div>
+        <div class="stars-info">
+            <b id="starsTitle">⭐ Как получить звёзды:</b>
+            <div class="star-row"><span class="stars">★★★</span><span id="stars3">— без подсказок и без сброса</span></div>
+            <div class="star-row"><span class="stars">★★☆</span><span id="stars2">— со сбросом, но без подсказок</span></div>
+            <div class="star-row"><span class="stars">★☆☆</span><span id="stars1">— с подсказкой</span></div>
+        </div>
+        <div class="shop-section">
+            <b id="shopTitle">🛒 Магазин</b>
+            <div style="margin:4px 0;display:flex;align-items:center;gap:6px;">
+                <span id="shopCoinsLabel">Монет:</span>
+                <span class="coins-display" id="shopCoins">0 <span class="coin"></span></span>
+            </div>
+            <button class="shop-btn buy-hint" id="shopHint1">💡 1 подсказка (20 <span class="coin coin-small"></span>)</button>
+            <button class="shop-btn buy-hint3" id="shopHint3">💡 3 подсказки (50 <span class="coin coin-small"></span>) 🔥</button>
+            <div style="font-size:12px;color:#888;margin-top:6px;"><span id="inStockLabel">Подсказок в запасе:</span> <b id="hintStockDisplay">5</b></div>
+        </div>
+        <h3 id="levelsTitle">📜 Уровни</h3>
+        <div id="levelsContainer" class="levels"></div>
+        <button id="clearProgress" class="danger" style="width:100%;margin-top:10px;">🗑️ Сбросить прогресс</button>
+    </div>
+</div>
+
+<!-- ОКНО ПОМОЩИ -->
+<div id="helpPanel">
+    <div class="help-box">
+        <button class="close-btn" id="closeHelp">✕</button>
+        <h2 id="helpTitle">❓ КАК ИГРАТЬ</h2>
+        <p id="helpGoal">Цель игры — поворачивать шестерни так, чтобы все числа превратились в зелёные галочки ✅.</p>
+        
+        <div class="help-section">
+            <div class="label" id="helpPCLabel">🖥️ На ПК:</div>
+            <ul>
+                <li id="helpPC1">Правый клик (ПКМ) — поворот по часовой.</li>
+                <li id="helpPC2">Левый клик (ЛКМ) — поворот против часовой.</li>
+            </ul>
+        </div>
+        
+        <div class="help-section">
+            <div class="label" id="helpMobileLabel">📱 На смартфоне:</div>
+            <ul>
+                <li id="helpMobile1">Правая половина — поворот по часовой.</li>
+                <li id="helpMobile2">Левая половина — поворот против часовой.</li>
+            </ul>
+        </div>
+        
+        <div class="help-section">
+            <div class="label" id="helpLocksLabel">🔒 Замки:</div>
+            <ul>
+                <li id="helpLocks">Чтобы снять замок, обнулите соседние шестерни.</li>
+            </ul>
+        </div>
+        
+        <div class="help-section">
+            <div class="label" id="helpHintLabel">💡 Подсказка:</div>
+            <ul>
+                <li id="helpHint">Показывает полный алгоритм решения уровня.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    const CONFIG = {
+        TEST_MODE: false,
+        DEMO_LEVELS: 5,
+        UNLOCK_ALL_PRICE: 99
+    };
+
+    const LANG = {
+        ru: {
+            title: 'GEAR PUZZLE',
+            subtitle: 'СОБЕРИ МЕХАНИЗМ',
+            play: 'ИГРАТЬ',
+            settings: 'НАСТРОЙКИ',
+            tutorial: 'КАК ИГРАТЬ',
+            version: 'ВЕРСИЯ 1.0',
+            level: 'Уровень',
+            moves: 'Ходы',
+            score: 'Очки',
+            total: 'Всего',
+            hint: 'Подсказка',
+            undo: 'Отмена',
+            reset: 'Сброс',
+            next: 'Следующий',
+            menu: 'Меню',
+            name: 'Имя',
+            player: 'Игрок',
+            playerName: 'Механик',
+            enterName: 'Введите имя',
+            completed: 'Уровней пройдено',
+            stars: 'Звёзд',
+            coins: 'Монет',
+            sound: 'Звук',
+            language: 'Язык / Language',
+            starsTitle: '⭐ Как получить звёзды:',
+            stars3: '— без подсказок и без сброса',
+            stars2: '— со сбросом, но без подсказок',
+            stars1: '— с подсказкой',
+            shop: '🛒 Магазин',
+            buy1: '💡 1 подсказка (20 🪙)',
+            buy3: '💡 3 подсказки (50 🪙) 🔥',
+            inStock: 'Подсказок в запасе:',
+            levels: '📜 Уровни',
+            clear: '🗑️ Сбросить прогресс',
+            locked: '🔒 Шестерёнка заблокирована!',
+            unlocked: '🔓 Шестерёнка %s разблокирована!',
+            tapGear: '👆 Нажми на шестерёнку',
+            continueCombo: 'Продолжай комбинацию',
+            hintCW: 'ПКМ / Правая половина — по часовой',
+            hintCCW: 'ЛКМ / Левая половина — против часовой',
+            noHints: '💡 Нет подсказок',
+            notEnoughCoins: '❌ Недостаточно монет!',
+            hintBought: '💡 Куплена 1 подсказка! (+1)',
+            hint3Bought: '💡 Куплено 3 подсказки! (+3)',
+            allUnlocked: '🔓 Все уровни открыты для тестирования!',
+            levelUnlocked: '📌 Переход на уровень %s',
+            levelLocked: '❌ Уровень ещё не открыт!',
+            resetConfirm: 'Сбросить весь прогресс игры?',
+            boss: '⭐ БОСС-УРОВЕНЬ!',
+            win: '🏆',
+            levelCompleted: 'Уровень %s пройден!',
+            coinsReward: '+%s 🪙 монет!',
+            wrongGear: '❌ Не та шестерёнка! Попробуй снова.',
+            gearUnlocked: '🔓 Шестерёнка %s разблокирована!',
+            gearLocked: '🔒 Шестерёнка заблокирована!',
+            howToPlayTitle: '❓ КАК ИГРАТЬ',
+            howToPlayGoal: 'Цель игры — поворачивать шестерни так, чтобы все числа превратились в зелёные галочки ✅.',
+            howToPlayPC: '🖥️ На ПК:',
+            howToPlayPC1: 'Правый клик (ПКМ) — поворот по часовой.',
+            howToPlayPC2: 'Левый клик (ЛКМ) — поворот против часовой.',
+            howToPlayMobile: '📱 На смартфоне:',
+            howToPlayMobile1: 'Правая половина — поворот по часовой.',
+            howToPlayMobile2: 'Левая половина — поворот против часовой.',
+            howToPlayLocks: 'Чтобы снять замок, обнулите соседние шестерни.',
+            howToPlayHint: 'Показывает полный алгоритм решения уровня.',
+            changelogTitle: 'ℹ️ История обновлений',
+            changelogHeader: '📜 ИСТОРИЯ ОБНОВЛЕНИЙ',
+            changelogV1: 'Версия 1.0 (Релиз): Первый релиз игры. Добавлена механика замков, система подсказок, управление на смартфоне, стимпанк-стиль, меню и магазин.',
+            changelogFooter: 'Будущие обновления будут появляться здесь!',
+            gears: 'шестерёнки',
+            step: 'Шаг',
+            of: 'из',
+            remaining: 'Осталось:',
+            moves_plural: 'ходов'
+        },
+        en: {
+            title: 'GEAR PUZZLE',
+            subtitle: 'ASSEMBLE THE MECHANISM',
+            play: 'PLAY',
+            settings: 'SETTINGS',
+            tutorial: 'HOW TO PLAY',
+            version: 'VERSION 1.0',
+            level: 'Level',
+            moves: 'Moves',
+            score: 'Score',
+            total: 'Total',
+            hint: 'Hint',
+            undo: 'Undo',
+            reset: 'Reset',
+            next: 'Next',
+            menu: 'Menu',
+            name: 'Name',
+            player: 'Player',
+            playerName: 'Mechanic',
+            enterName: 'Enter name',
+            completed: 'Levels completed',
+            stars: 'Stars',
+            coins: 'Coins',
+            sound: 'Sound',
+            language: 'Language / Язык',
+            starsTitle: '⭐ How to get stars:',
+            stars3: '— without hints and without reset',
+            stars2: '— with reset, but without hints',
+            stars1: '— with hint',
+            shop: '🛒 Shop',
+            buy1: '💡 1 hint (20 🪙)',
+            buy3: '💡 3 hints (50 🪙) 🔥',
+            inStock: 'Hints in stock:',
+            levels: '📜 Levels',
+            clear: '🗑️ Reset progress',
+            locked: '🔒 Gear is locked!',
+            unlocked: '🔓 Gear %s unlocked!',
+            tapGear: '👆 Tap on the gear',
+            continueCombo: 'Continue the combination',
+            hintCW: 'RMB / Right half — clockwise',
+            hintCCW: 'LMB / Left half — counterclockwise',
+            noHints: '💡 No hints',
+            notEnoughCoins: '❌ Not enough coins!',
+            hintBought: '💡 1 hint bought! (+1)',
+            hint3Bought: '💡 3 hints bought! (+3)',
+            allUnlocked: '🔓 All levels unlocked for testing!',
+            levelUnlocked: '📌 Jump to level %s',
+            levelLocked: '❌ Level not yet unlocked!',
+            resetConfirm: 'Reset all game progress?',
+            boss: '⭐ BOSS LEVEL!',
+            win: '🏆',
+            levelCompleted: 'Level %s completed!',
+            coinsReward: '+%s 🪙 coins!',
+            wrongGear: '❌ Wrong gear! Try again.',
+            gearUnlocked: '🔓 Gear %s unlocked!',
+            gearLocked: '🔒 Gear is locked!',
+            howToPlayTitle: '❓ HOW TO PLAY',
+            howToPlayGoal: 'The goal is to turn the gears until all numbers turn into green checkmarks ✅.',
+            howToPlayPC: '🖥️ On PC:',
+            howToPlayPC1: 'Right click (RMB) — rotate clockwise.',
+            howToPlayPC2: 'Left click (LMB) — rotate counterclockwise.',
+            howToPlayMobile: '📱 On smartphone:',
+            howToPlayMobile1: 'Right half — rotate clockwise.',
+            howToPlayMobile2: 'Left half — rotate counterclockwise.',
+            howToPlayLocks: 'To unlock a gear, zero out the neighboring gears.',
+            howToPlayHint: 'Shows the full solution algorithm for the level.',
+            changelogTitle: 'ℹ️ Update History',
+            changelogHeader: '📜 CHANGELOG',
+            changelogV1: 'Version 1.0 (Release): First game release. Lock mechanism, hint system, smartphone controls, steampunk style, menu and shop.',
+            changelogFooter: 'Future updates will appear here!',
+            gears: 'gears',
+            step: 'Step',
+            of: 'of',
+            remaining: 'Remaining:',
+            moves_plural: 'moves'
+        }
+    };
+
+    let currentLang = 'ru';
+
+    function t(key, ...args) {
+        let text = LANG[currentLang]?.[key] || LANG.ru[key] || key;
+        if (args.length) {
+            text = text.replace(/%s/g, () => args.shift());
+        }
+        return text;
+    }
+
+    let level = 1,
+        unlocked = 1,
+        moves = 0,
+        score = 1000,
+        total = 0,
+        coins = 0,
+        hintStock = 5,
+        levelUsedHint = false;
+    let gears = [],
+        history = [],
+        solved = false,
+        animating = false,
+        winShown = false,
+        animationId = null,
+        usedReset = false;
+    let bestScores = {},
+        bestStars = {},
+        playerName = 'Механик',
+        soundEnabled = true,
+        audioContext = null;
+    let gearImage = null;
+    let hintGroups = [],
+        hintGroupIndex = 0,
+        hintProgress = 0,
+        hintActive = false,
+        hintError = false,
+        hintRemaining = [];
+
+    const $ = id => document.getElementById(id);
+    const canvas = $('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const POSITIONS_3 = [{ x: 200, y: 120 }, { x: 270, y: 280 }, { x: 130, y: 280 }];
+    const POSITIONS_4 = [{ x: 200, y: 78 }, { x: 310, y: 200 }, { x: 200, y: 322 }, { x: 90, y: 200 }];
+    const POSITIONS_5 = [{ x: 200, y: 78 }, { x: 314, y: 147 }, { x: 270, y: 275 }, { x: 130, y: 275 }, { x: 86, y: 147 }];
+
+    const TEETH_3 = [
+        [8, 10, 12],
+        [6, 9, 12],
+        [8, 12, 16],
+        [10, 14, 18],
+        [6, 8, 10]
+    ];
+    const TEETH_4 = [
+        [8, 10, 12, 14],
+        [6, 8, 10, 12],
+        [8, 10, 14, 16],
+        [10, 12, 14, 16],
+        [6, 9, 12, 17]
+    ];
+    const TEETH_5 = [
+        [6, 8, 10, 12, 14],
+        [8, 10, 12, 14, 16],
+        [6, 9, 12, 15, 18],
+        [8, 11, 14, 17, 20],
+        [6, 8, 10, 14, 17]
+    ];
+
+    function getLevelConfig(levelNumber) {
+        let teethCount, movesCount, lockCount = 0;
+        if (levelNumber <= 5) { teethCount = 3; movesCount = 4 + Math.floor((levelNumber - 1) * 1.1); lockCount = 0; }
+        else if (levelNumber <= 8) { teethCount = 3; movesCount = 6 + Math.floor((levelNumber - 5) * 1.2); lockCount = Math.random() < 0.5 ? 1 : 0; }
+        else if (levelNumber <= 13) { teethCount = 4; movesCount = 8 + Math.floor((levelNumber - 9) * 1.2); lockCount = Math.random() < 0.4 ? 1 : 0; }
+        else if (levelNumber <= 16) { teethCount = 4; movesCount = 10 + Math.floor((levelNumber - 13) * 1.3); lockCount = Math.random() < 0.5 ? 1 : 0; }
+        else if (levelNumber <= 18) { teethCount = 4; movesCount = 12 + Math.floor((levelNumber - 16) * 1.4); lockCount = Math.random() < 0.5 ? 1 : 0; }
+        else if (levelNumber <= 22) { teethCount = 5; movesCount = 14 + Math.floor((levelNumber - 19) * 1.4); lockCount = Math.random() < 0.3 ? 1 : 0; }
+        else if (levelNumber <= 27) { teethCount = 5; movesCount = 16 + Math.floor((levelNumber - 22) * 1.5); lockCount = Math.random() < 0.5 ? 1 : 0; }
+        else if (levelNumber <= 35) { teethCount = 5; movesCount = 20 + Math.floor((levelNumber - 27) * 1.2); const rand = Math.random(); if (rand < 0.33) lockCount = 0; else if (rand < 0.66) lockCount = 1; else lockCount = 2; }
+        else if (levelNumber <= 40) { teethCount = 5; movesCount = Math.min(35, 27 + Math.floor((levelNumber - 35) * 0.5)); lockCount = Math.random() < 0.3 ? 1 : 0; }
+        else { teethCount = 5; movesCount = Math.min(35, 30 + Math.floor((levelNumber - 40) * 0.3)); const rand = Math.random(); if (rand < 0.33) lockCount = 0; else if (rand < 0.66) lockCount = 1; else lockCount = 2; }
+        movesCount = Math.min(movesCount, 35);
+        return { teethCount, movesCount, isSpecial: levelNumber % 5 === 0, lockCount };
+    }
+
+    function mod(value, number) { return ((value % number) + number) % number; }
+
+    function getTeeth(levelNumber) {
+        const config = getLevelConfig(levelNumber);
+        const count = config.teethCount;
+        let sets;
+        if (count === 3) sets = TEETH_3;
+        else if (count === 4) sets = TEETH_4;
+        else sets = TEETH_5;
+        let index;
+        if (count === 3) index = (levelNumber - 1) % sets.length;
+        else if (count === 4) index = (levelNumber - 9) % sets.length;
+        else index = (levelNumber - 19) % sets.length;
+        if (index < 0) index += sets.length;
+        if (!sets[index]) index = 0;
+        return sets[index].slice();
+    }
+
+    function getPositions(count) {
+        if (count === 3) return POSITIONS_3;
+        if (count === 4) return POSITIONS_4;
+        return POSITIONS_5;
+    }
+
+    function createGear(x, y, teeth, value, label) {
+        return { x, y, teeth, value, label, angle: 0, active: false, hint: false, speed: 0, locked: false };
+    }
+
+    function applyMove3(state, index, direction, teeth) {
+        const result = state.slice();
+        const partner = direction === 'cw' ? (index + 1) % 3 : (index + 2) % 3;
+        if (direction === 'cw') { result[index] = mod(result[index] - 1, teeth[index]); result[partner] = mod(result[partner] + 1, teeth[partner]); }
+        else { result[index] = mod(result[index] + 1, teeth[index]); result[partner] = mod(result[partner] - 1, teeth[partner]); }
+        return result;
+    }
+
+    function applyMove4(state, index, direction, teeth) {
+        const result = state.slice();
+        const count = teeth.length;
+        const next = (index + 1) % count;
+        const previous = (index - 1 + count) % count;
+        if (direction === 'cw') { result[index] = mod(result[index] - 1, teeth[index]); result[next] = mod(result[next] + 1, teeth[next]); result[previous] = mod(result[previous] - 1, teeth[previous]); }
+        else { result[index] = mod(result[index] + 1, teeth[index]); result[next] = mod(result[next] - 1, teeth[next]); result[previous] = mod(result[previous] + 1, teeth[previous]); }
+        return result;
+    }
+
+    function applyMove5(state, index, direction, teeth) {
+        const result = state.slice();
+        const count = teeth.length;
+        const next = (index + 1) % count;
+        const previous = (index - 1 + count) % count;
+        if (direction === 'cw') { result[index] = mod(result[index] - 1, teeth[index]); result[next] = mod(result[next] + 1, teeth[next]); result[previous] = mod(result[previous] - 1, teeth[previous]); }
+        else { result[index] = mod(result[index] + 1, teeth[index]); result[next] = mod(result[next] - 1, teeth[next]); result[previous] = mod(result[previous] + 1, teeth[previous]); }
+        return result;
+    }
+
+    function randomState(teeth, count) {
+        let state = new Array(teeth.length).fill(0);
+        for (let i = 0; i < count; i++) {
+            const index = Math.floor(Math.random() * teeth.length);
+            const direction = Math.random() < .5 ? 'cw' : 'ccw';
+            if (teeth.length === 3) state = applyMove3(state, index, direction, teeth);
+            else if (teeth.length === 4) state = applyMove4(state, index, direction, teeth);
+            else state = applyMove5(state, index, direction, teeth);
+        }
+        return state;
+    }
+
+    function saveGame() {
+        const data = { level, unlocked, total, coins, hintStock, bestScores, bestStars, playerName, soundEnabled,
+            currentLevel: level, values: gears.map(g => g.value), moves, score, usedReset, hintGroups, hintGroupIndex,
+            hintProgress, hintActive, levelUsedHint, lang: currentLang, locked: gears.map(g => g.locked) };
+        localStorage.setItem('gearPuzzleSave', JSON.stringify(data));
+    }
+
+    function loadGame() {
+        try { return JSON.parse(localStorage.getItem('gearPuzzleSave')); } catch { return null; }
+    }
+
+    function showHelp() {
+        const panel = $('helpPanel');
+        panel.classList.add('open');
+        panel.style.display = 'flex';
+        
+        $('helpTitle').textContent = t('howToPlayTitle');
+        $('helpGoal').textContent = t('howToPlayGoal');
+        $('helpPCLabel').textContent = t('howToPlayPC');
+        $('helpPC1').textContent = t('howToPlayPC1');
+        $('helpPC2').textContent = t('howToPlayPC2');
+        $('helpMobileLabel').textContent = t('howToPlayMobile');
+        $('helpMobile1').textContent = t('howToPlayMobile1');
+        $('helpMobile2').textContent = t('howToPlayMobile2');
+        $('helpLocksLabel').textContent = '🔒 ' + t('howToPlayLocks').split(' ')[0] + ':';
+        $('helpLocks').textContent = t('howToPlayLocks');
+        $('helpHintLabel').textContent = '💡 ' + t('howToPlayHint').split(' ')[0] + ':';
+        $('helpHint').textContent = t('howToPlayHint');
+    }
+
+    function closeHelp() {
+        const panel = $('helpPanel');
+        panel.classList.remove('open');
+        panel.style.display = 'none';
+    }
+
+    function boot() {
+        gearImage = new Image();
+        gearImage.src = 'gear-flat.png';
+        
+        const saved = loadGame();
+        if (saved) {
+            level = Number(saved.level) || 1;
+            unlocked = Number(saved.unlocked) || 1;
+            total = Number(saved.total) || 0;
+            coins = Number(saved.coins) || 0;
+            hintStock = Number(saved.hintStock) !== undefined ? Number(saved.hintStock) : 5;
+            bestScores = saved.bestScores || {};
+            bestStars = saved.bestStars || {};
+            playerName = saved.playerName || 'Механик';
+            soundEnabled = saved.soundEnabled !== false;
+            currentLang = saved.lang || 'ru';
+            
+            if (saved.hintGroups && saved.hintGroups.length > 0) {
+                hintGroups = saved.hintGroups;
+                hintGroupIndex = saved.hintGroupIndex || 0;
+                hintProgress = saved.hintProgress || 0;
+                hintActive = saved.hintActive || false;
+            }
+            levelUsedHint = Boolean(saved.levelUsedHint);
+        }
+        updateAllTexts();
+        startLevel(level, saved);
+        requestAnimationFrame(draw);
+    }
+
+    function startLevel(levelNumber, savedData = null) {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+
+        level = levelNumber;
+        const teeth = getTeeth(levelNumber);
+        const positions = getPositions(teeth.length);
+        const config = getLevelConfig(levelNumber);
+
+        let values = level === 1 ? [3, 5, 2] : randomState(teeth, config.movesCount);
+        if (values.every(v => v === 0)) {
+            const idx = Math.floor(Math.random() * teeth.length);
+            const dir = Math.random() < 0.5 ? 'cw' : 'ccw';
+            if (teeth.length === 3) values = applyMove3(values, idx, dir, teeth);
+            else if (teeth.length === 4) values = applyMove4(values, idx, dir, teeth);
+            else values = applyMove5(values, idx, dir, teeth);
+        }
+
+        gears = teeth.map((teethValue, index) => {
+            return createGear(positions[index].x, positions[index].y, teethValue, values[index], String.fromCharCode(65 + index));
+        });
+
+        // Восстанавливаем замки из сохранения
+        if (savedData && savedData.locked && savedData.locked.length === gears.length) {
+            gears.forEach((gear, index) => {
+                gear.locked = savedData.locked[index];
+            });
+        }
+
+        if (hintActive && hintGroups.length > 0 && hintGroupIndex < hintGroups.length) {
+            if (gears[hintGroups[hintGroupIndex].index]) {
+                gears[hintGroups[hintGroupIndex].index].hint = true;
+            }
+        }
+
+        const lockCount = config.lockCount || 0;
+        if (lockCount === 1) {
+            const lockIndex = Math.floor(Math.random() * gears.length);
+            gears[lockIndex].locked = true;
+        } else if (lockCount === 2) {
+            const start = Math.floor(Math.random() * gears.length);
+            gears[start].locked = true;
+            gears[(start + 2) % gears.length].locked = true;
+        }
+
+        document.querySelector('.win')?.remove();
+
+        moves = 0;
+        score = 1000;
+        history = [];
+        solved = false;
+        animating = false;
+        winShown = false;
+        usedReset = false;
+        levelUsedHint = false;
+        if (!savedData || savedData.currentLevel !== levelNumber) {
+            hintGroups = [];
+            hintGroupIndex = 0;
+            hintProgress = 0;
+            hintActive = false;
+        }
+        hintError = false;
+        hintRemaining = [];
+
+        const hasStars = (bestStars[levelNumber] || 0) > 0;
+        if (!hasStars && savedData && savedData.currentLevel === levelNumber &&
+            Array.isArray(savedData.values) && savedData.values.length === gears.length) {
+            const hasOnlyZeros = savedData.values.every(v => v === 0);
+            if (!hasOnlyZeros) {
+                gears.forEach((gear, index) => { gear.value = savedData.values[index]; });
+                moves = Number(savedData.moves) || 0;
+                score = typeof savedData.score === 'number' ? savedData.score : 1000;
+                usedReset = Boolean(savedData.usedReset);
+                levelUsedHint = Boolean(savedData.levelUsedHint);
+            }
+        }
+
+        $('level').textContent = level;
+        $('moves').textContent = moves;
+        $('score').textContent = score;
+
+        updateUndoButton();
+        $('hint').disabled = hintStock <= 0;
+        $('next').disabled = true;
+        updateHintButton();
+
+        const specialText = config.isSpecial ? ' ⭐ БОСС-УРОВЕНЬ!' : '';
+        const gearEmoji = config.teethCount === 3 ? '⚙️' : config.teethCount === 4 ? '🔧' : '🔩';
+        const lockInfo = lockCount > 0 ? ` 🔒${lockCount}` : '';
+        if (hintActive && hintGroups.length > 0) { updateHintDisplay(); } else {
+            $('info').textContent = `📌 ${t('level')} ${level} ${gearEmoji}${config.teethCount} ${t('gears')}${lockInfo}${specialText}`;
+        }
+
+        draw();
+        saveGame();
+        requestAnimationFrame(draw);
+    }
+
+    function updateAllTexts() {
+        // НАЧАЛЬНЫЙ ЭКРАН
+        $('startTitle').textContent = t('title');
+        $('startSubtitle').textContent = t('subtitle');
+        $('startPlayBtn').innerHTML = `<span class="btn-text">${t('play')}</span>`;
+        $('startSettingsBtn').innerHTML = `<span class="btn-text">${t('settings')}</span>`;
+        $('startTutorialBtn').innerHTML = `<span class="btn-text">${t('tutorial')}</span>`;
+        $('startVersion').textContent = t('version');
+
+        // МЕНЮ
+        const menuTitle = document.querySelector('.box h3:first-of-type');
+        if (menuTitle) menuTitle.textContent = '⚙️ ' + t('menu');
+
+        // Строки меню (Name, Player, Score, и т.д.)
+        const rows = document.querySelectorAll('.row');
+        if (rows.length >= 8) {
+            const labels = ['name', 'player', 'score', 'completed', 'stars', 'coins', 'sound', 'language'];
+            rows.forEach((row, index) => {
+                if (index < labels.length) {
+                    const span = row.querySelector('span:first-child');
+                    if (span) span.textContent = t(labels[index]) + ':';
+                }
+            });
+        }
+
+        // Placeholder для поля ввода имени
+        const nameInput = $('nameInput');
+        if (nameInput) nameInput.placeholder = t('enterName');
+
+        // Имя игрока
+        const profileName = $('profileName');
+        if (profileName) profileName.textContent = t('playerName');
+
+        // ЗВЁЗДЫ
+        const starsTitle = document.querySelector('.stars-info b');
+        if (starsTitle) starsTitle.textContent = t('starsTitle');
+        $('stars3').textContent = t('stars3');
+        $('stars2').textContent = t('stars2');
+        $('stars1').textContent = t('stars1');
+
+        // МАГАЗИН
+        const shopTitle = document.querySelector('.shop-section b');
+        if (shopTitle) shopTitle.textContent = t('shop');
+        
+        const shopCoinsLabel = $('shopCoinsLabel');
+        if (shopCoinsLabel) shopCoinsLabel.textContent = t('coins') + ':';
+        
+        $('shopHint1').innerHTML = t('buy1');
+        $('shopHint3').innerHTML = t('buy3');
+        
+        const inStockLabel = $('inStockLabel');
+        if (inStockLabel) inStockLabel.textContent = t('inStock');
+
+        // УРОВНИ
+        const levelsTitle = document.querySelector('.box h3:last-of-type');
+        if (levelsTitle) levelsTitle.textContent = t('levels');
+        $('clearProgress').textContent = t('clear');
+
+        // ИГРОВОЙ ЭКРАН
+        $('hintText').innerHTML = `👆 <span class="cw">${t('hintCW')}</span> | <span class="ccw">${t('hintCCW')}</span>`;
+        $('levelLabel').textContent = t('level');
+        $('movesLabel').textContent = t('moves') + ': ';
+        $('scoreLabel').textContent = t('score') + ': ';
+        $('totalLabel').textContent = t('total') + ': ';
+        $('undo').textContent = t('undo');
+        $('reset').textContent = t('reset');
+        $('next').textContent = t('next');
+
+        // ПОДСКАЗКИ
+        updateHintButton();
+        updateInfoText();
+        const hintStockEl = $('hintStockDisplay');
+        if (hintStockEl) hintStockEl.textContent = hintStock;
+    }
+
+    function updateHintButton() {
+        const hintBtn = $('hint');
+        if (hintStock > 0) {
+            hintBtn.textContent = `${t('hint')} (${hintStock})`;
+            hintBtn.disabled = false;
+            hintBtn.className = '';
+        } else {
+            hintBtn.textContent = t('noHints');
+            hintBtn.disabled = true;
+            hintBtn.className = 'empty';
+        }
+    }
+
+    function updateInfoText() {
+        const config = getLevelConfig(level);
+        const gearEmoji = config.teethCount === 3 ? '⚙️' : config.teethCount === 4 ? '🔧' : '🔩';
+        const lockCount = config.lockCount || 0;
+        const lockInfo = lockCount > 0 ? ` 🔒${lockCount}` : '';
+        const specialText = config.isSpecial ? ' ⭐' : '';
+        if (solved) return;
+        if (hintActive && hintGroups.length > 0) { updateHintDisplay(); return; }
+        $('info').textContent = moves === 0 ?
+            `${t('tapGear')} (${level} ${gearEmoji}${config.teethCount} ${t('gears')}${lockInfo}${specialText})` :
+            `${t('continueCombo')} (${gears.length} ${t('gears')})`;
+    }
+
+    function updateUndoButton() {
+        const undoBtn = $('undo');
+        if (history.length > 0 && !solved) {
+            undoBtn.textContent = `${t('undo')} (${history.length})`;
+            undoBtn.disabled = false;
+        } else {
+            undoBtn.textContent = t('undo');
+            undoBtn.disabled = true;
+        }
+    }
+
+    function updateHintDisplay() {
+        if (!gears || gears.length === 0) {
+            return;
+        }
+        
+        if (!hintActive || hintGroups.length === 0) { 
+            $('info').innerHTML = ''; 
+            return; 
+        }
+        let html = `<div class="solution">`;
+        html += `<b>💡 ${t('hint')} (${hintGroups.reduce((sum, g) => sum + g.count, 0)} ${t('moves_plural')})</b>`;
+        html += `<div style="font-size:12px;margin:4px 0;color:#aaa;">`;
+        if (hintGroupIndex < hintGroups.length) {
+            const totalSteps = hintGroups.length;
+            const currentStep = hintGroupIndex + 1;
+            const remainingMoves = hintGroups[hintGroupIndex].count - hintProgress;
+            html += `${t('step')} ${currentStep} ${t('of')} ${totalSteps} (${t('remaining')} ${remainingMoves} ${t('moves_plural')})`;
+        } else {
+            html += `✅ ${t('win')}!`;
+        }
+        html += `</div>`;
+        hintGroups.forEach((group, idx) => {
+            const gear = gears[group.index];
+            const directionText = group.direction === 'cw' ? 'по часовой' : 'против часовой';
+            const isDone = idx < hintGroupIndex;
+            const isCurrent = idx === hintGroupIndex && hintGroupIndex < hintGroups.length;
+            const isError = hintError && isCurrent;
+            let className = 'step-pending';
+            if (isDone) className = 'step-done';
+            if (isCurrent && !isError) className = 'step-current';
+            if (isError) className = 'step-error';
+            let progressText = '';
+            if (isCurrent && !isError) progressText = ` (${hintProgress}/${group.count})`;
+            if (isDone) progressText = ` ✅`;
+            if (isError) progressText = ` ❌ ${t('wrongGear')}`;
+            html += `<div class="${className}">${idx + 1}. <b>${gear.label}</b> — ${directionText} ${group.count > 1 ? `×${group.count}` : ''}${progressText}</div>`;
+        });
+        html += `</div>`;
+        $('info').innerHTML = html;
+    }
+
+    function stateKey(state) { return state.join(','); }
+
+    function isSolved(state) { return state.every(v => v === 0); }
+
+    function findSolution() {
+        const teeth = gears.map(g => g.teeth);
+        const startValues = gears.map(g => g.value);
+        const startLocked = gears.map(g => g.locked);
+        
+        if (isSolved(startValues)) return [];
+        
+        function getStateKey(values, locked) {
+            return values.join(',') + '|' + locked.map(l => l ? 1 : 0).join(',');
+        }
+        
+        function checkLockUnlock(values, locked) {
+            const newLocked = locked.slice();
+            const count = values.length;
+            for (let i = 0; i < count; i++) {
+                if (newLocked[i]) {
+                    const prev = values[(i - 1 + count) % count];
+                    const next = values[(i + 1) % count];
+                    let shouldUnlock = false;
+                    if (count === 3) {
+                        if (prev === 0 || next === 0) shouldUnlock = true;
+                    } else {
+                        if (prev === 0 && next === 0) shouldUnlock = true;
+                    }
+                    if (shouldUnlock) {
+                        newLocked[i] = false;
+                    }
+                }
+            }
+            return newLocked;
+        }
+        
+        const queue = [{ values: startValues, locked: startLocked }];
+        const parents = new Map();
+        const startKey = getStateKey(startValues, startLocked);
+        parents.set(startKey, null);
+        let pointer = 0;
+        let finalKey = null;
+        
+        while (pointer < queue.length && !finalKey) {
+            const current = queue[pointer++];
+            const currentValues = current.values;
+            const currentLocked = current.locked;
+            
+            for (let index = 0; index < teeth.length && !finalKey; index++) {
+                if (currentLocked[index]) continue;
+                
+                for (const direction of ['cw', 'ccw']) {
+                    let nextValues;
+                    if (teeth.length === 3) nextValues = applyMove3(currentValues, index, direction, teeth);
+                    else if (teeth.length === 4) nextValues = applyMove4(currentValues, index, direction, teeth);
+                    else nextValues = applyMove5(currentValues, index, direction, teeth);
+                    
+                    const nextLocked = checkLockUnlock(nextValues, currentLocked);
+                    
+                    const key = getStateKey(nextValues, nextLocked);
+                    if (parents.has(key)) continue;
+                    parents.set(key, { previous: getStateKey(currentValues, currentLocked), index, direction });
+                    
+                    if (isSolved(nextValues)) {
+                        finalKey = key;
+                        break;
+                    }
+                    queue.push({ values: nextValues, locked: nextLocked });
+                }
+            }
+        }
+        
+        if (!finalKey) return null;
+        
+        const result = [];
+        let key = finalKey;
+        while (parents.get(key)) {
+            const step = parents.get(key);
+            result.push({ index: step.index, direction: step.direction });
+            key = step.previous;
+        }
+        return result.reverse();
+    }
+
+    function showHint() {
+        if (solved || animating) return;
+        if (hintStock <= 0) {
+            showNotification(t('noHints'), 'error');
+            return;
+        }
+        const solution = findSolution();
+        if (!solution) { $('info').textContent = '💡 Решение не найдено'; return; }
+        hintStock--;
+        levelUsedHint = true;
+        hintGroups = [];
+        let currentGroup = null;
+        solution.forEach(step => {
+            if (!currentGroup || currentGroup.index !== step.index || currentGroup.direction !== step.direction) {
+                currentGroup = { index: step.index, direction: step.direction, count: 1 };
+                hintGroups.push(currentGroup);
+            } else {
+                currentGroup.count++;
+            }
+        });
+        hintGroupIndex = 0;
+        hintProgress = 0;
+        hintActive = true;
+        hintError = false;
+        hintRemaining = solution.slice(1);
+        gears.forEach(g => g.hint = false);
+        if (hintGroups.length > 0) { gears[hintGroups[0].index].hint = true; }
+        updateHintDisplay();
+        updateHintButton();
+        tone(520, .08, .03);
+        saveGame();
+        draw();
+    }
+
+    function makeMove(index, direction) {
+        if (solved || animating) return;
+        if (gears[index] && gears[index].locked) {
+            showNotification(t('gearLocked'), 'error');
+            return;
+        }
+        if (hintActive && hintGroups.length > 0 && hintGroupIndex < hintGroups.length) {
+            const currentGroup = hintGroups[hintGroupIndex];
+            if (currentGroup.index === index && currentGroup.direction === direction) {
+                hintProgress++;
+                if (hintProgress >= currentGroup.count) {
+                    hintGroupIndex++;
+                    hintProgress = 0;
+                    gears.forEach(g => g.hint = false);
+                    if (hintGroupIndex < hintGroups.length) {
+                        gears[hintGroups[hintGroupIndex].index].hint = true;
+                    } else {
+                        hintActive = false;
+                    }
+                }
+                hintError = false;
+                updateHintDisplay();
+            } else {
+                hintError = true;
+                gears.forEach(g => g.hint = false);
+                gears[index].hint = true;
+                updateHintDisplay();
+                errorSound();
+                showNotification(t('wrongGear'), 'error');
+                return;
+            }
+        }
+        history.push(saveState());
+        if (gears.length === 3) makeMove3(index, direction);
+        else if (gears.length === 4) makeMove4(index, direction);
+        else makeMove5(index, direction);
+    }
+
+    function makeMove3(index, direction) {
+        const gear = gears[index];
+        const partnerIndex = direction === 'cw' ? (index + 1) % 3 : (index + 2) % 3;
+        const partner = gears[partnerIndex];
+        if (direction === 'cw') {
+            gear.value = mod(gear.value - 1, gear.teeth);
+            partner.value = mod(partner.value + 1, partner.teeth);
+        } else {
+            gear.value = mod(gear.value + 1, gear.teeth);
+            partner.value = mod(partner.value - 1, partner.teeth);
+        }
+        moves++;
+        score = Math.max(0, 1000 - moves * 50);
+        $('moves').textContent = moves;
+        $('score').textContent = score;
+        animatePair(gear, partner, direction, finishMove);
+    }
+
+    function makeMove4(index, direction) {
+        const count = gears.length;
+        const selected = gears[index];
+        const next = gears[(index + 1) % count];
+        const previous = gears[(index - 1 + count) % count];
+        if (direction === 'cw') {
+            selected.value = mod(selected.value - 1, selected.teeth);
+            next.value = mod(next.value + 1, next.teeth);
+            previous.value = mod(previous.value - 1, previous.teeth);
+        } else {
+            selected.value = mod(selected.value + 1, selected.teeth);
+            next.value = mod(next.value - 1, next.teeth);
+            previous.value = mod(previous.value + 1, previous.teeth);
+        }
+        moves++;
+        score = Math.max(0, 1000 - moves * 50);
+        $('moves').textContent = moves;
+        $('score').textContent = score;
+        animateTriple(selected, next, previous, direction, finishMove);
+    }
+
+    function makeMove5(index, direction) {
+        const count = gears.length;
+        const selected = gears[index];
+        const next = gears[(index + 1) % count];
+        const previous = gears[(index - 1 + count) % count];
+        if (direction === 'cw') {
+            selected.value = mod(selected.value - 1, selected.teeth);
+            next.value = mod(next.value + 1, next.teeth);
+            previous.value = mod(previous.value - 1, previous.teeth);
+        } else {
+            selected.value = mod(selected.value + 1, selected.teeth);
+            next.value = mod(next.value - 1, next.teeth);
+            previous.value = mod(previous.value + 1, previous.teeth);
+        }
+        moves++;
+        score = Math.max(0, 1000 - moves * 50);
+        $('moves').textContent = moves;
+        $('score').textContent = score;
+        animateTriple(selected, next, previous, direction, finishMove);
+    }
+
+    function saveState() {
+        return { 
+            values: gears.map(g => g.value), 
+            angles: gears.map(g => g.angle), 
+            moves, 
+            score,
+            locked: gears.map(g => g.locked)
+        };
+    }
+
+    function restoreState(state) {
+        gears.forEach((gear, index) => {
+            gear.value = state.values[index];
+            gear.angle = state.angles[index];
+            gear.locked = state.locked[index];
+            gear.active = false;
+        });
+        moves = state.moves;
+        score = state.score;
+        $('moves').textContent = moves;
+        $('score').textContent = score;
+        hintGroups = [];
+        hintGroupIndex = 0;
+        hintProgress = 0;
+        hintActive = false;
+        hintError = false;
+        hintRemaining = [];
+        gears.forEach(g => g.hint = false);
+        updateInfoText();
+        updateUndoButton();
+        draw();
+        saveGame();
+    }
+
+    function animatePair(first, second, direction, done) {
+        animating = true;
+        first.active = true;
+        second.active = true;
+        const start = performance.now();
+        const duration = 190;
+        const firstStart = first.angle;
+        const secondStart = second.angle;
+        const firstEnd = firstStart + (direction === 'cw' ? 360 / first.teeth : -360 / first.teeth);
+        const secondEnd = secondStart + (direction === 'cw' ? -360 / second.teeth : 360 / second.teeth);
+
+        function frame(time) {
+            const progress = Math.min(1, (time - start) / duration);
+            const smooth = 1 - Math.pow(1 - progress, 3);
+            first.angle = firstStart + (firstEnd - firstStart) * smooth;
+            second.angle = secondStart + (secondEnd - secondStart) * smooth;
+            draw();
+            if (progress < 1) requestAnimationFrame(frame);
+            else {
+                first.angle = mod(first.angle, 360);
+                second.angle = mod(second.angle, 360);
+                first.active = false;
+                second.active = false;
+                animating = false;
+                done();
+            }
+        }
+        requestAnimationFrame(frame);
+    }
+
+    function animateTriple(selected, next, previous, direction, done) {
+        animating = true;
+        const start = performance.now();
+        const duration = 220;
+        const sign = direction === 'cw' ? 1 : -1;
+        const items = [[selected, sign], [next, -sign], [previous, sign]];
+        const starts = items.map(item => item[0].angle);
+        const ends = items.map((item, index) => starts[index] + item[1] * 360 / item[0].teeth);
+        items.forEach(item => item[0].active = true);
+
+        function frame(time) {
+            const progress = Math.min(1, (time - start) / duration);
+            const smooth = 1 - Math.pow(1 - progress, 3);
+            items.forEach((item, index) => {
+                item[0].angle = starts[index] + (ends[index] - starts[index]) * smooth;
+            });
+            draw();
+            if (progress < 1) requestAnimationFrame(frame);
+            else {
+                items.forEach(item => {
+                    item[0].angle = mod(item[0].angle, 360);
+                    item[0].active = false;
+                });
+                animating = false;
+                done();
+            }
+        }
+        requestAnimationFrame(frame);
+    }
+
+    function finishMove() {
+        let anyUnlocked = false;
+        gears.forEach((gear, index) => {
+            if (gear.locked) {
+                const prev = gears[(index - 1 + gears.length) % gears.length];
+                const next = gears[(index + 1) % gears.length];
+                let shouldUnlock = false;
+                if (gears.length === 3) {
+                    if (prev.value === 0 || next.value === 0) shouldUnlock = true;
+                } else {
+                    if (prev.value === 0 && next.value === 0) shouldUnlock = true;
+                }
+                if (shouldUnlock) {
+                    gear.locked = false;
+                    anyUnlocked = true;
+                    showNotification(t('gearUnlocked', gear.label), 'success');
+                }
+            }
+        });
+        
+        if (anyUnlocked) draw();
+
+        const completed = gears.length > 0 && gears.every(g => g.value === 0);
+        if (completed) {
+            solved = true;
+            animating = false;
+            $('undo').disabled = true;
+            $('hint').disabled = true;
+            $('next').disabled = false;
+            hintGroups = [];
+            hintGroupIndex = 0;
+            hintProgress = 0;
+            hintActive = false;
+            hintError = false;
+            hintRemaining = [];
+            gears.forEach(g => g.hint = false);
+            saveGame();
+            draw();
+            setTimeout(() => showWin(), 250);
+            return;
+        }
+
+        updateInfoText();
+        updateUndoButton();
+        saveGame();
+    }
+
+    function showWin() {
+        if (winShown) return;
+        winShown = true;
+        solved = true;
+        $('next').disabled = false;
+        winSound();
+
+        let resultStars = levelUsedHint ? 1 : usedReset ? 2 : 3;
+        const oldStars = bestStars[level] || 0;
+        const isFirstTime = oldStars === 0;
+
+        let coinReward = 0;
+        if (isFirstTime) {
+            coinReward = resultStars === 3 ? 30 : resultStars === 2 ? 20 : 10;
+        }
+
+        const config = getLevelConfig(level);
+        const bossBonus = config.isSpecial && isFirstTime ? 50 : 0;
+        const totalCoins = coinReward + bossBonus;
+        if (totalCoins > 0) {
+            coins += totalCoins;
+            coinSound();
+            setTimeout(() => showNotification(t('coinsReward', totalCoins), 'success'), 500);
+        }
+
+        if (score > (bestScores[level] || 0)) {
+            total += score - (bestScores[level] || 0);
+            bestScores[level] = score;
+        }
+        bestStars[level] = Math.max(bestStars[level] || 0, resultStars);
+        if (level >= unlocked) unlocked = level + 1;
+        saveGame();
+        updateProfile();
+
+        const overlay = document.createElement('div');
+        overlay.className = 'win';
+        const specialText = config.isSpecial ? ' ⭐ БОСС-УРОВЕНЬ!' : '';
+        const starsStr = '★'.repeat(resultStars) + '☆'.repeat(3 - resultStars);
+        overlay.innerHTML = `
+            🏆<br>
+            <small>
+                ${t('levelCompleted', level)}${specialText}<br>
+                <div class="stars-row" id="starsRow">${starsStr}</div>
+                ${t('score')}: ${score}<br>
+                ${t('moves')}: ${moves}<br>
+                ${t('total')}: ${total}<br>
+                ${totalCoins > 0 ? `+${totalCoins} 🪙 ${t('coins')}!` : ''}
+            </small>
+        `;
+        document.querySelector('.wrap').appendChild(overlay);
+        setTimeout(() => {
+            const starsRow = overlay.querySelector('.stars-row');
+            const text = starsRow.textContent;
+            starsRow.innerHTML = '';
+            for (let i = 0; i < text.length; i++) {
+                const span = document.createElement('span');
+                span.className = 'star';
+                span.textContent = text[i];
+                if (text[i] === '★' || text[i] === '☆') {
+                    starsRow.appendChild(span);
+                    setTimeout(() => span.classList.add('show'), i * 200 + 300);
+                } else {
+                    starsRow.appendChild(document.createTextNode(text[i]));
+                }
+            }
+        }, 100);
+        startWinAnimation();
+    }
+
+    function startWinAnimation() {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+        gears.forEach((gear, index) => { gear.speed = 1.1 + index * .8; });
+
+        function frame() {
+            if (!solved) return;
+            gears.forEach(gear => { gear.angle = mod(gear.angle + gear.speed, 360); });
+            draw();
+            animationId = requestAnimationFrame(frame);
+        }
+        frame();
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.strokeStyle = 'rgba(52, 52, 91, 0.4)';
+        ctx.lineWidth = 3;
+        for (let i = 0; i < gears.length; i++) {
+            const a = i, b = (i + 1) % gears.length;
+            if (!gears[a] || !gears[b]) continue;
+            ctx.beginPath();
+            ctx.moveTo(gears[a].x, gears[a].y);
+            ctx.lineTo(gears[b].x, gears[b].y);
+            ctx.stroke();
+        }
+        gears.forEach(drawGear);
+    }
+
+    function drawGear(gear) {
+        ctx.save();
+        ctx.translate(gear.x, gear.y);
+        ctx.rotate(gear.angle * Math.PI / 180);
+        const radius = 42;
+        ctx.shadowColor = gear.hint ? '#67e8ff' : gear.active ? '#ffd866' : '#000';
+        ctx.shadowBlur = gear.hint || gear.active ? 25 : 12;
+        
+        if (gearImage && gearImage.complete && gearImage.naturalWidth > 0) {
+            let size = 120;
+            ctx.drawImage(gearImage, -size / 2, -size / 2, size, size);
+        } else {
+            ctx.fillStyle = gear.locked ? '#666' : '#d9a940';
+            ctx.beginPath();
+            ctx.arc(0, 0, radius, 0, Math.PI * 2);
+            ctx.fill();
+            for (let i = 0; i < gear.teeth; i++) {
+                const angle = i * Math.PI * 2 / gear.teeth - Math.PI / 2;
+                ctx.fillStyle = gear.locked ? '#444' : '#f2cf76';
+                ctx.beginPath();
+                ctx.arc(Math.cos(angle) * 47, Math.sin(angle) * 47, 6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        ctx.restore();
+        ctx.fillStyle = '#101022';
+        ctx.beginPath();
+        ctx.arc(gear.x, gear.y, 18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = gear.value === 0 ? '#32e87d' : '#fff';
+        ctx.font = 'bold 26px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(gear.value === 0 ? '✓' : gear.value, gear.x, gear.y + 9);
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'bold 13px Arial';
+        ctx.fillText(gear.label + gear.teeth, gear.x, gear.y - 26);
+        ctx.strokeStyle = gear.hint ? '#67e8ff' : gear.value === 0 ? '#2ecc71' : '#f0b34b';
+        ctx.lineWidth = gear.hint ? 4 : 2;
+        ctx.beginPath();
+        ctx.arc(gear.x, gear.y, 46, 0, Math.PI * 2);
+        ctx.stroke();
+        if (gear.locked) {
+            ctx.save();
+            ctx.fillStyle = '#ff4444';
+            ctx.font = '28px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🔒', gear.x, gear.y - 62);
+            ctx.restore();
+        }
+    }
+
+    function updateProfile() {
+        const completed = Object.keys(bestStars).length;
+        const totalStars = Object.values(bestStars).reduce((sum, v) => sum + v, 0);
+        const maxStars = completed * 3;
+        $('profileName').textContent = t('playerName');
+        $('profileTotalScore').textContent = total;
+        $('profileCompleted').textContent = `${completed} / ${Math.max(0, unlocked - 1)}`;
+        $('profileStars').textContent = `${totalStars} / ${maxStars || 0}`;
+        $('profileCoins').innerHTML = `${coins} <span class="coin coin-small"></span>`;
+        $('shopCoins').innerHTML = `${coins} <span class="coin"></span>`;
+        
+        const hintStockEl = $('hintStockDisplay');
+        if (hintStockEl) hintStockEl.textContent = hintStock;
+        
+        $('total').textContent = total;
+        updateHintButton();
+    }
+
+    function renderLevels() {
+        const container = $('levelsContainer');
+        container.innerHTML = '';
+        for (let number = 1; number <= unlocked; number++) {
+            const button = document.createElement('button');
+            const resultStars = bestStars[number] || 0;
+            const config = getLevelConfig(number);
+            const isBoss = config.isSpecial;
+            const isCompleted = resultStars > 0;
+            const isCurrent = number === level;
+            const isLocked = number > unlocked;
+            const gearCount = config.teethCount;
+            const gearEmoji = gearCount === 3 ? '⚙️' : gearCount === 4 ? '🔧' : '🔩';
+            const starsStr = '★'.repeat(resultStars) + '☆'.repeat(3 - resultStars);
+            const lockInfo = config.lockCount > 0 ? '🔒' : '';
+            button.textContent = `${number} ${gearEmoji}${gearCount} ${lockInfo} ${starsStr}`;
+            button.title = `${gearCount} шестеренки, ${config.movesCount} ходов`;
+            if (isLocked) {
+                button.className = 'locked';
+                button.textContent = `${number} 🔒`;
+            } else {
+                if (isCompleted) { button.className = `completed stars-${resultStars}`; }
+                if (isBoss) button.classList.add('boss');
+                if (isCurrent) button.classList.add('current');
+                button.onclick = () => { startLevel(number); $('panel').classList.remove('open'); $('panel').style.display = 'none'; };
+            }
+            container.appendChild(button);
+        }
+    }
+
+    function buyHint() {
+        if (coins < 20) {
+            showNotification(t('notEnoughCoins'), 'error');
+            return;
+        }
+        coins -= 20;
+        hintStock++;
+        saveGame();
+        updateProfile();
+        updateHintButton();
+        
+        const hintStockEl = $('hintStockDisplay');
+        if (hintStockEl) hintStockEl.textContent = hintStock;
+        
+        coinSound();
+        showNotification(t('hintBought'), 'success');
+    }
+
+    function buyHint3() {
+        if (coins < 50) {
+            showNotification(t('notEnoughCoins'), 'error');
+            return;
+        }
+        coins -= 50;
+        hintStock += 3;
+        saveGame();
+        updateProfile();
+        updateHintButton();
+        
+        const hintStockEl = $('hintStockDisplay');
+        if (hintStockEl) hintStockEl.textContent = hintStock;
+        
+        coinSound();
+        showNotification(t('hint3Bought'), 'success');
+    }
+
+    function updateLangButtons() {
+        document.querySelectorAll('.lang-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.lang === currentLang);
+        });
+    }
+
+    function detectLanguage() {
+        let s = localStorage.getItem('gearPuzzleLang');
+        if (s) return s;
+        let b = navigator.language || navigator.userLanguage;
+        if (b.startsWith('ru') || b.startsWith('uk') || b.startsWith('be')) return 'ru';
+        return 'en';
+    }
+
+    function getAudio() {
+        if (!audioContext) {
+            const Audio = window.AudioContext || window.webkitAudioContext;
+            if (!Audio) return null;
+            audioContext = new Audio();
+        }
+        if (audioContext.state === 'suspended') { audioContext.resume(); }
+        return audioContext;
+    }
+
+    function tone(frequency, duration = .08, volume = .03, delay = 0) {
+        if (!soundEnabled) return;
+        const audio = getAudio();
+        if (!audio) return;
+        const start = audio.currentTime + delay;
+        const oscillator = audio.createOscillator();
+        const gain = audio.createGain();
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(volume, start);
+        gain.gain.exponentialRampToValueAtTime(.001, start + duration);
+        oscillator.connect(gain);
+        gain.connect(audio.destination);
+        oscillator.start(start);
+        oscillator.stop(start + duration);
+    }
+
+    function moveSound() { tone(175, .07, .035); }
+    function winSound() { tone(330, .12, .04); tone(440, .14, .04, .1); tone(660, .22, .045, .22); }
+    function errorSound() { tone(120, .15, .03); }
+    function coinSound() { tone(880, .08, .025); setTimeout(() => tone(1100, .1, .025), 100); }
+
+    function showNotification(message, type = 'info') {
+        const container = document.querySelector('.wrap');
+        if (!container) return;
+        
+        const existing = container.querySelector('.notification');
+        if (existing) existing.remove();
+        
+        const div = document.createElement('div');
+        div.className = `notification ${type}`;
+        div.textContent = message;
+        container.appendChild(div);
+        
+        const isMobile = window.innerWidth < 768;
+        setTimeout(() => {
+            if (div.parentNode) div.remove();
+        }, isMobile ? 2500 : 3500);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        currentLang = detectLanguage();
+        document.querySelector('#langSelect').value = currentLang;
+        updateLangButtons();
+        document.querySelectorAll('.lang-btn').forEach(b => {
+            b.addEventListener('click', function() {
+                currentLang = this.dataset.lang;
+                localStorage.setItem('gearPuzzleLang', currentLang);
+                document.querySelector('#langSelect').value = currentLang;
+                updateLangButtons();
+                updateAllTexts();
+                saveGame();
+            });
+        });
+
+        $('startPlayBtn').addEventListener('click', function() {
+            $('startScreen').classList.add('hidden');
+            $('game').classList.add('active');
+            boot();
+        });
+
+        $('startSettingsBtn').addEventListener('click', function() {
+            $('startScreen').classList.add('hidden');
+            $('game').classList.add('active');
+            $('panel').style.display = 'flex';
+            $('panel').classList.add('open');
+            renderLevels();
+            updateProfile();
+        });
+
+        $('startTutorialBtn').addEventListener('click', showHelp);
+
+        $('menuBtn').addEventListener('click', function() {
+            $('panel').style.display = 'flex';
+            $('panel').classList.add('open');
+            renderLevels();
+            updateProfile();
+        });
+
+        $('closePanel').addEventListener('click', function() {
+            $('panel').style.display = 'none';
+            $('panel').classList.remove('open');
+        });
+
+        $('panel').addEventListener('click', function(e) {
+            if (e.target === this) {
+                $('panel').style.display = 'none';
+                $('panel').classList.remove('open');
+            }
+        });
+
+        $('helpBtn').addEventListener('click', showHelp);
+        $('closeHelp').addEventListener('click', closeHelp);
+        $('helpPanel').addEventListener('click', function(e) {
+            if (e.target === this) closeHelp();
+        });
+
+        $('undo').addEventListener('click', function() {
+            if (history.length && !animating && !solved) {
+                restoreState(history.pop());
+            }
+        });
+
+        $('reset').addEventListener('click', function() {
+            if (animating) return;
+            usedReset = true;
+            startLevel(level);
+            saveGame();
+        });
+
+        $('hint').addEventListener('click', showHint);
+
+        $('next').addEventListener('click', function() {
+            if (!solved) return;
+            if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+            document.querySelector('.win')?.remove();
+            solved = false;
+            winShown = false;
+            animating = false;
+            startLevel(level + 1);
+            $('next').disabled = true;
+            requestAnimationFrame(draw);
+        });
+
+        $('shopHint1').addEventListener('click', buyHint);
+        $('shopHint3').addEventListener('click', buyHint3);
+
+        $('soundToggle').addEventListener('change', function() {
+            soundEnabled = this.checked;
+            saveGame();
+        });
+
+        $('nameInput').addEventListener('change', function() {
+            playerName = this.value.trim() || t('playerName');
+            saveGame();
+            updateProfile();
+        });
+
+        $('langSelect').addEventListener('change', function() {
+            currentLang = this.value;
+            updateAllTexts();
+            saveGame();
+        });
+
+        $('clearProgress').addEventListener('click', function() {
+            if (confirm(t('resetConfirm'))) {
+                localStorage.removeItem('gearPuzzleSave');
+                location.reload();
+            }
+        });
+
+        // УПРАВЛЕНИЕ МЫШЬЮ (ПК)
+        canvas.addEventListener('click', function(event) {
+            getAudio();
+            const rect = canvas.getBoundingClientRect();
+            const x = (event.clientX - rect.left) * 400 / rect.width;
+            const y = (event.clientY - rect.top) * 400 / rect.height;
+            let selected = -1;
+            let distance = 54;
+            gears.forEach((gear, index) => {
+                const d = Math.hypot(gear.x - x, gear.y - y);
+                if (d < distance) { distance = d; selected = index; }
+            });
+            if (selected >= 0) {
+                moveSound();
+                makeMove(selected, 'ccw'); // ЛКМ → против часовой
+            }
+        });
+
+        canvas.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+            getAudio();
+            const rect = canvas.getBoundingClientRect();
+            const x = (event.clientX - rect.left) * 400 / rect.width;
+            const y = (event.clientY - rect.top) * 400 / rect.height;
+            let selected = -1;
+            let distance = 54;
+            gears.forEach((gear, index) => {
+                const d = Math.hypot(gear.x - x, gear.y - y);
+                if (d < distance) { distance = d; selected = index; }
+            });
+            if (selected >= 0) {
+                moveSound();
+                makeMove(selected, 'cw'); // ПКМ → по часовой
+            }
+        });
+
+        // УПРАВЛЕНИЕ ТАЧ (ТЕЛЕФОН)
+        canvas.addEventListener('touchstart', function(event) {
+            event.preventDefault();
+            const touch = event.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = (touch.clientX - rect.left) * 400 / rect.width;
+            const y = (touch.clientY - rect.top) * 400 / rect.height;
+            
+            let selected = -1;
+            let distance = 54;
+            gears.forEach((gear, index) => {
+                const d = Math.hypot(gear.x - x, gear.y - y);
+                if (d < distance) { distance = d; selected = index; }
+            });
+            
+            if (selected >= 0) {
+                getAudio();
+                const gear = gears[selected];
+                const dx = x - gear.x;
+                if (dx > 0) {
+                    moveSound();
+                    makeMove(selected, 'cw'); // Правая половина → по часовой
+                } else {
+                    moveSound();
+                    makeMove(selected, 'ccw'); // Левая половина → против часовой
+                }
+            }
+        });
+
+        canvas.addEventListener('touchmove', function(event) {
+            event.preventDefault();
+        });
+
+        boot();
+    });
+</script>
+</body>
+</html>
