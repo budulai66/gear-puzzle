@@ -658,7 +658,7 @@
         boot();
     });
 
-    // ============================================================
+// ============================================================
     // КОНСОЛЬНЫЕ КОМАНДЫ ДЛЯ ТЕСТИРОВАНИЯ
     // ============================================================
     
@@ -669,5 +669,55 @@
         unlocked = realUnlocked; if (level > unlocked) level = unlocked; renderLevels(); updateProfile(); saveGame(); console.log("✅ Прогресс восстановлен. Открыто уровней: " + unlocked);
     };
 </script>
+
+<!-- ============================================================ -->
+<!-- ФИКС ДЛЯ TELEGRAM MINI APP (ЧТОБЫ КНОПКИ НЕ ПРОПАДАЛИ)       -->
+<!-- ============================================================ -->
+<script>
+    // Расширяем игру на всю высоту экрана Telegram
+    document.documentElement.style.height = '100%';
+    document.body.style.height = '100%';
+    document.body.style.overflow = 'hidden';
+    
+    // Сдвигаем контент вверх, освобождая место для панели Telegram
+    const gameContainer = document.getElementById('game');
+    if (gameContainer) {
+        gameContainer.style.paddingBottom = '80px';
+        gameContainer.style.marginBottom = '80px';
+    }
+    
+    // Если есть кнопки, не даём им прятаться за экраном
+    const buttonsDiv = document.getElementById('buttons');
+    if (buttonsDiv) {
+        buttonsDiv.style.position = 'relative';
+        buttonsDiv.style.zIndex = '1000';
+    }
+
+    // Когда окно игры открывается, принудительно поднимаем контент
+    setTimeout(() => {
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+    }, 300);
+</script>
+
+<style>
+    /* Критический стиль: защита от обрезания */
+    #game {
+        padding-bottom: 80px !important;
+        display: block !important;
+    }
+    #buttons button {
+        min-height: 52px;
+        margin-bottom: 4px;
+    }
+    #info {
+        margin-bottom: 10px;
+    }
+    /* Убираем прокрутку, чтобы панель не прыгала */
+    .wrap {
+        overflow: hidden;
+    }
+</style>
+
 </body>
 </html>
