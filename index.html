@@ -1177,18 +1177,69 @@
         [6, 8, 10, 14, 17]
     ];
 
+    // ============================================================
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ getLevelConfig()
+    // ============================================================
     function getLevelConfig(levelNumber) {
         let teethCount, movesCount, lockCount = 0;
-        if (levelNumber <= 5) { teethCount = 3; movesCount = 4 + Math.floor((levelNumber - 1) * 1.1); lockCount = 0; }
-        else if (levelNumber <= 8) { teethCount = 3; movesCount = 6 + Math.floor((levelNumber - 5) * 1.2); lockCount = Math.random() < 0.5 ? 1 : 0; }
-        else if (levelNumber <= 13) { teethCount = 4; movesCount = 8 + Math.floor((levelNumber - 9) * 1.2); lockCount = Math.random() < 0.4 ? 1 : 0; }
-        else if (levelNumber <= 16) { teethCount = 4; movesCount = 10 + Math.floor((levelNumber - 13) * 1.3); lockCount = Math.random() < 0.5 ? 1 : 0; }
-        else if (levelNumber <= 18) { teethCount = 4; movesCount = 12 + Math.floor((levelNumber - 16) * 1.4); lockCount = Math.random() < 0.5 ? 1 : 0; }
-        else if (levelNumber <= 22) { teethCount = 5; movesCount = 14 + Math.floor((levelNumber - 19) * 1.4); lockCount = Math.random() < 0.3 ? 1 : 0; }
-        else if (levelNumber <= 27) { teethCount = 5; movesCount = 16 + Math.floor((levelNumber - 22) * 1.5); lockCount = Math.random() < 0.5 ? 1 : 0; }
-        else if (levelNumber <= 35) { teethCount = 5; movesCount = 20 + Math.floor((levelNumber - 27) * 1.2); const rand = Math.random(); if (rand < 0.33) lockCount = 0; else if (rand < 0.66) lockCount = 1; else lockCount = 2; }
-        else if (levelNumber <= 40) { teethCount = 5; movesCount = Math.min(35, 27 + Math.floor((levelNumber - 35) * 0.5)); lockCount = Math.random() < 0.3 ? 1 : 0; }
-        else { teethCount = 5; movesCount = Math.min(35, 30 + Math.floor((levelNumber - 40) * 0.3)); const rand = Math.random(); if (rand < 0.33) lockCount = 0; else if (rand < 0.66) lockCount = 1; else lockCount = 2; }
+        
+        if (levelNumber <= 5) { 
+            teethCount = 3; 
+            movesCount = 4 + Math.floor((levelNumber - 1) * 1.1); 
+            lockCount = 0; 
+        } 
+        else if (levelNumber <= 8) { 
+            teethCount = 3; 
+            movesCount = 6 + Math.floor((levelNumber - 5) * 1.2); 
+            lockCount = Math.random() < 0.5 ? 1 : 0; 
+        } 
+        else if (levelNumber <= 13) { 
+            teethCount = 4; 
+            movesCount = 8 + Math.floor((levelNumber - 9) * 1.2); 
+            lockCount = Math.random() < 0.4 ? 1 : 0; 
+        } 
+        else if (levelNumber <= 16) { 
+            teethCount = 4; 
+            movesCount = 10 + Math.floor((levelNumber - 13) * 1.3); 
+            lockCount = Math.random() < 0.5 ? 1 : 0; 
+        } 
+        else if (levelNumber <= 18) { 
+            teethCount = 4; 
+            movesCount = 12 + Math.floor((levelNumber - 16) * 1.4); 
+            lockCount = Math.random() < 0.5 ? 1 : 0;  // ИСПРАВЛЕНО: было 2
+        } 
+        else if (levelNumber <= 22) { 
+            teethCount = 5; 
+            movesCount = 14 + Math.floor((levelNumber - 19) * 1.4); 
+            lockCount = Math.random() < 0.3 ? 1 : 0; 
+        } 
+        else if (levelNumber <= 27) { 
+            teethCount = 5; 
+            movesCount = 16 + Math.floor((levelNumber - 22) * 1.5); 
+            lockCount = Math.random() < 0.5 ? 1 : 0; 
+        } 
+        else if (levelNumber <= 35) { 
+            teethCount = 5; 
+            movesCount = 20 + Math.floor((levelNumber - 27) * 1.2); 
+            const rand = Math.random(); 
+            if (rand < 0.33) lockCount = 0; 
+            else if (rand < 0.66) lockCount = 1; 
+            else lockCount = 2; 
+        } 
+        else if (levelNumber <= 40) { 
+            teethCount = 5; 
+            movesCount = Math.min(35, 27 + Math.floor((levelNumber - 35) * 0.5)); 
+            lockCount = Math.random() < 0.3 ? 1 : 0; 
+        } 
+        else { 
+            teethCount = 5; 
+            movesCount = Math.min(35, 30 + Math.floor((levelNumber - 40) * 0.3)); 
+            const rand = Math.random(); 
+            if (rand < 0.33) lockCount = 0; 
+            else if (rand < 0.66) lockCount = 1; 
+            else lockCount = 2; 
+        }
+        
         movesCount = Math.min(movesCount, 35);
         return { teethCount, movesCount, isSpecial: levelNumber % 5 === 0, lockCount };
     }
