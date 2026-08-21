@@ -1,0 +1,2555 @@
+<!doctype html>
+<!-- GEAR PUZZLE v3.0 | © 2026 All rights reserved -->
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gear Puzzle v3.0</title>
+
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=111640186', 'ym');
+        ym(111640186, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/111640186" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #070711; color: #eee; font-family: Arial, sans-serif; touch-action: manipulation; overflow: hidden; -webkit-user-select: none; user-select: none; }
+
+        #startScreen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #070711; background-image: url('start_bg.jpg'), radial-gradient(circle at 50% 40%, #1a1a35 0%, #070711 70%); background-size: cover, cover; background-position: center, center; background-repeat: no-repeat, no-repeat; box-shadow: inset 0 0 0 2000px rgba(5, 3, 10, 0.55); z-index: 1000; padding: 20px; overflow: hidden; font-family: 'Cinzel', 'Orbitron', sans-serif; }
+        #startScreen.hidden { display: none; }
+        .lang-switcher { position: absolute; top: 20px; right: 20px; display: flex; gap: 2px; z-index: 10; background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,215,0,0.2); backdrop-filter: blur(4px); font-family: 'Orbitron', sans-serif; font-size: 13px; letter-spacing: 1px; }
+        .lang-btn { border: none; background: transparent; color: #8888aa; font-weight: 600; font-size: 13px; font-family: 'Orbitron', sans-serif; cursor: pointer; transition: all 0.2s ease; padding: 2px 6px; border-radius: 4px; display: flex; align-items: center; justify-content: center; user-select: none; }
+        .lang-btn:hover { color: #fff; }
+        .lang-btn.active { color: #ffd866; background: rgba(255,216,102,0.15); }
+        .lang-divider { color: #555; font-weight: 300; }
+        .logo-gear { width: 130px; height: 130px; position: relative; margin-bottom: 14px; z-index: 2; animation: spinLogo 18s linear infinite; filter: drop-shadow(0 0 20px rgba(255,216,102,0.3)); }
+        .logo-gear img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        @keyframes spinLogo { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .start-title { font-family: 'Cinzel', serif; font-size: clamp(30px, 6vw, 50px); font-weight: 700; color: #ffd866; text-shadow: 0 0 40px rgba(255,216,102,0.15), 0 4px 10px rgba(0,0,0,0.9); letter-spacing: 8px; text-align: center; z-index: 2; margin-bottom: 4px; }
+        .start-subtitle { font-family: 'Orbitron', sans-serif; font-size: clamp(11px, 2vw, 15px); color: #ccccee; letter-spacing: 8px; text-align: center; z-index: 2; margin-bottom: 8px; text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
+        .rank-badge { z-index: 2; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.4); border-radius: 20px; padding: 5px 16px; font-family: 'Orbitron', sans-serif; font-size: 13px; color: #ffd866; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .rank-bar-wrap { z-index: 2; width: min(280px, 70%); height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden; margin-bottom: 22px; border: 1px solid rgba(255,215,0,0.2); }
+        .rank-bar { height: 100%; background: linear-gradient(90deg, #b8860b, #ffd866); width: 0%; transition: width 0.5s; }
+        .button-group { display: flex; flex-direction: row; gap: 12px; width: 100%; max-width: 480px; justify-content: center; z-index: 2; margin-top: auto; margin-bottom: 36px; flex-wrap: wrap; }
+        .start-btn { display: flex; align-items: center; justify-content: center; padding: 12px 22px; border: 2px solid rgba(184,115,51,0.5); border-radius: 8px; background: rgba(26,22,40,0.65); backdrop-filter: blur(4px); color: #ccb888; font-size: 13px; font-weight: 600; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.5); user-select: none; touch-action: manipulation; flex: 1; min-width: 110px; }
+        .start-btn:hover { transform: translateY(-3px); border-color: #ffd866; background: rgba(36,32,56,0.8); }
+        .start-btn:active { transform: translateY(2px); }
+        .start-footer { position: absolute; bottom: 10px; padding: 3px 14px; border: 1px solid rgba(255,215,0,0.08); border-radius: 3px; background: rgba(0,0,0,0.3); color: #8888aa; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 2px; opacity: 0.6; z-index: 2; }
+
+        #game { width: min(460px, calc(100% - 24px)); padding: 14px; border: 1px solid #30305a; border-radius: 22px; background: linear-gradient(#17172f, #0d0d1c); display: none; }
+        #game.active { display: block; }
+        header { display: flex; justify-content: space-between; align-items: center; gap: 6px; border-bottom: 2px solid #29294f; padding-bottom: 8px; flex-wrap: wrap; }
+        #menuBtn { background: none; border: none; color: #ffd866; font-size: 20px; cursor: pointer; padding: 4px 8px; }
+        #helpBtn { background: none; border: none; color: #aaaaca; font-size: 16px; cursor: pointer; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
+        .stats { color: #aaaaca; font-size: 10px; display: flex; gap: 7px; flex-wrap: wrap; }
+        .stats b { color: #fff; }
+        .stat-item { display: flex; align-items: center; gap: 2px; }
+        .stat-item .icon { font-size: 13px; }
+        .wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; max-height: 52vh; margin: 10px auto 6px; }
+        canvas { display: block; width: 100%; height: 100%; border: 1px solid #292950; border-radius: 18px; background-color: #0d0d1c; background-image: url('start_bg.jpg'), radial-gradient(circle at 50% 50%, #1a1a35 0%, #0d0d1c 100%); background-size: cover, cover; background-position: center, center; box-shadow: inset 0 0 0 2000px rgba(0,0,0,0.55); touch-action: none; cursor: pointer; }
+        #hintText { padding: 5px; border-radius: 8px; background: #191936; color: #aaaaca; text-align: center; font-size: 11px; margin: 4px 0; }
+        .cw { color: #63e99b; } .ccw { color: #ff8585; }
+        #info { min-height: 40px; max-height: 110px; overflow-y: auto; padding: 6px 0; color: #aaaaca; text-align: center; line-height: 19px; font-size: 12px; }
+        #buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+        #buttons button { border: 0; border-radius: 12px; padding: 13px 8px; font-weight: bold; font-size: 13px; cursor: pointer; transition: all 0.15s; touch-action: manipulation; user-select: none; min-height: 50px; }
+        #buttons button:active { transform: scale(0.94); }
+        #buttons button:disabled { opacity: 0.35; pointer-events: none; }
+        #undo { background: #5665a8; color: #fff; } #reset { background: #a93652; color: #fff; }
+        #hint { background: #d99b35; color: #191200; } #hint.empty { background: #444; color: #888; opacity: 0.6; }
+        #next { background: #3dbb7a; color: #07110a; }
+
+        .win { position: absolute; inset: 0; display: grid; place-content: center; border-radius: 18px; background: rgba(0,0,0,0.82); text-align: center; z-index: 10; font-size: 26px; backdrop-filter: blur(4px); padding: 20px; }
+        .win small { color: #ffd866; font-size: 13px; line-height: 21px; }
+        .win .stars-row { font-size: 30px; margin: 6px 0; min-height: 40px; }
+        .win .stars-row .star { display: inline-block; opacity: 0; transform: scale(0); transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+        .win .stars-row .star.show { opacity: 1; transform: scale(1); }
+        .win .double-btn { margin-top: 10px; padding: 10px 18px; border-radius: 10px; border: 1px solid #7aa7ff; background: linear-gradient(135deg,#5b8def,#3a6fd8); color: #fff; font-weight: bold; font-size: 13px; cursor: pointer; }
+        .coin { display: inline-block; width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(ellipse at 30% 30%, #f7d875, #b8860b); border: 2px solid #8b6914; box-shadow: inset -3px -3px 8px rgba(0,0,0,0.5), 0 0 8px rgba(255,215,0,0.1); position: relative; vertical-align: middle; margin: 0 2px; }
+        .coin::after { content: 'C'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 11px; font-weight: bold; color: #8b6914; font-family: 'Cinzel', serif; }
+        .coin-small { width: 15px; height: 15px; } .coin-small::after { font-size: 8px; }
+
+              #helpPanel, #panel, #dailyPanel, #achievePanel, #energyPanel, #rankupPanel, #energyInfoPanel { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); z-index: 1500; backdrop-filter: blur(8px); padding: 20px; }
+        #helpPanel.open, #panel.open, #dailyPanel.open, #achievePanel.open, #energyPanel.open, #rankupPanel.open, #energyInfoPanel.open { display: flex; }
+        .box, .help-box { width: min(500px, 100%); max-height: 82vh; padding: 22px; border-radius: 18px; background: #17172f; border: 2px solid #ffd866; box-shadow: 0 0 60px rgba(255,216,102,0.08); overflow-y: auto; position: relative; }
+        .close-btn { background: none !important; color: #aaa !important; font-size: 24px; float: right; padding: 0 8px !important; min-height: auto !important; border: none; cursor: pointer; }
+        .close-btn:hover { color: #fff !important; }
+        .box h3, .help-box h2 { color: #ffd866; font-family: 'Cinzel', serif; margin-bottom: 14px; letter-spacing: 2px; }
+        .help-box h2 { font-size: 20px; } .box h3 { font-size: 17px; margin: 14px 0 8px; }
+        .help-box p { color: #ccccee; font-size: 13px; line-height: 1.6; margin-bottom: 8px; }
+        .help-section { margin: 10px 0; padding: 9px 13px; background: #1a1a35; border-radius: 10px; border-left: 3px solid #ffd866; }
+        .help-section .label { color: #ffd866; font-weight: bold; font-size: 13px; }
+        .help-section ul { list-style: none; padding: 4px 0 0 16px; }
+        .help-section ul li { color: #aaaaca; font-size: 12px; line-height: 1.6; position: relative; }
+        .help-section ul li::before { content: '•'; color: #ffd866; position: absolute; left: -14px; }
+        .row { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; margin: 4px 0; border-radius: 8px; background: #222242; flex-wrap: wrap; gap: 4px; font-size: 13px; }
+        .row input[type="text"] { background: #0d0d1c; border: 1px solid #44446b; border-radius: 6px; padding: 7px 10px; color: #fff; width: 130px; font-size: 13px; }
+        .row input[type="checkbox"] { width: 20px; height: 20px; accent-color: #ffd866; cursor: pointer; }
+        .row select { background: #0d0d1c; border: 1px solid #44446b; border-radius: 6px; padding: 7px 10px; color: #fff; font-size: 13px; cursor: pointer; }
+        .levels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 10px 0; }
+        .levels button { font-size: 10px; padding: 7px 2px; border-radius: 8px; min-height: 46px; background: #222242; color: #aaa; word-break: break-word; line-height: 1.2; border: 1px solid transparent; cursor: pointer; }
+        .levels button.completed { background: #1a3a1a; color: #fff; border-color: #4caf50; }
+        .levels button.completed.stars-3 { border-color: #ffd700; } .levels button.completed.stars-2 { border-color: #c0c0c0; } .levels button.completed.stars-1 { border-color: #cd7f32; }
+        .levels button.locked { background: #111128; color: #444; opacity: 0.6; cursor: not-allowed; }
+        .levels button.boss { position: relative; } .levels button.boss::after { content: "👾"; position: absolute; top: -6px; right: -6px; font-size: 13px; }
+        .levels button.current { border: 2px solid #ffd866; }
+        .shop-section { background: #1a1a35; padding: 11px; border-radius: 10px; margin: 8px 0; border-left: 3px solid #4caf50; }
+        .shop-section .coins-display { font-size: 20px; color: #ffd700; font-weight: bold; display: flex; align-items: center; gap: 6px; }
+        .shop-section .shop-btn { padding: 9px 14px; font-size: 13px; background: #29294c; color: #fff; margin: 4px; border-radius: 10px; border: none; min-height: 46px; cursor: pointer; touch-action: manipulation; }
+        .shop-section .shop-btn:disabled { opacity: 0.4; }
+        .shop-section .shop-btn.buy-hint { background: #d99b35; color: #191200; }
+        .shop-section .shop-btn.buy-hint3 { background: #f0a030; color: #191200; border: 1px solid #ffd700; }
+        .shop-section .shop-btn.buy-stars { background: linear-gradient(135deg,#5b8def,#3a6fd8); color: #fff; border: 1px solid #7aa7ff; width: 100%; }
+        .rank-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 6px 0; }
+        .rank-table td { padding: 5px 7px; border-bottom: 1px solid #2a2a4a; color: #ccccee; }
+        .rank-table td:first-child { color: #ffd866; font-weight: bold; white-space: nowrap; }
+        .rank-table tr.current-rank { background: rgba(255,216,102,0.12); }
+        .achieve-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; margin: 5px 0; border-radius: 8px; background: #222242; font-size: 12px; }
+        .achieve-item.done { background: #1a3a1a; border: 1px solid #4caf50; }
+        .achieve-item .rew { color: #ffd700; }
+        .daily-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 10px 0; }
+        .daily-cell { aspect-ratio: 1; border-radius: 10px; background: #222242; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #aaa; border: 1px solid transparent; }
+        .daily-cell.claimed { background: #1a3a1a; border-color: #4caf50; color: #fff; }
+        .daily-cell.today { border-color: #ffd866; box-shadow: 0 0 12px rgba(255,216,102,0.2); }
+        .daily-cell .dnum { font-size: 10px; opacity: 0.7; } .daily-cell .drew { font-size: 16px; }
+        .big-btn { width: 100%; padding: 13px; border-radius: 12px; border: none; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 8px; touch-action: manipulation; }
+        .big-btn.gold { background: #d99b35; color: #191200; }
+        .big-btn.blue { background: linear-gradient(135deg,#5b8def,#3a6fd8); color: #fff; }
+        .big-btn.green { background: #3dbb7a; color: #07110a; }
+        .big-btn:disabled { opacity: 0.4; }
+		/* === ВИЗУАЛЬНЫЙ ОТКЛИК ДЛЯ КНОПОК В МЕНЮ === */
+        .big-btn:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+            transition: all 0.1s ease;
+        }
+
+        #tipLayer { position: fixed; inset: 0; display: none; z-index: 2000; background: rgba(0,0,0,0.5); align-items: flex-end; justify-content: center; padding-bottom: 90px; pointer-events: none; }
+        #tipLayer.open { display: flex; }
+        .tip-box { pointer-events: auto; width: min(420px, 92%); background: rgba(26,26,58,0.97); border: 2px solid #ffd866; border-radius: 14px; padding: 14px 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.8); animation: tipIn 0.3s ease-out; }
+        @keyframes tipIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .tip-box .tip-text { color: #eee; font-size: 13px; line-height: 1.5; margin-bottom: 10px; }
+        .tip-box .tip-ok { float: right; background: #ffd866; color: #191200; border: none; border-radius: 8px; padding: 6px 16px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        .notification { position: absolute; top: 5%; left: 50%; transform: translateX(-50%); padding: 9px 18px; border-radius: 12px; background: rgba(26,26,58,0.95); border: 2px solid #ffd866; color: #ffd866; font-weight: bold; z-index: 100; animation: slideDown 0.4s ease-out; box-shadow: 0 4px 30px rgba(0,0,0,0.8); text-align: center; max-width: 82%; font-size: 13px; pointer-events: none; }
+        .notification.success { border-color: #4caf50; color: #4caf50; }
+        .notification.error { border-color: #ff4444; color: #ff4444; }
+        @keyframes slideDown { 0% { opacity: 0; transform: translateX(-50%) translateY(-20px); } 100% { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+        @media(max-width:480px) { #game { padding: 11px; } .stats { font-size: 9px; gap: 5px; } #buttons button { font-size: 12px; padding: 11px 6px; min-height: 46px; } .box, .help-box { padding: 14px; } .levels { grid-template-columns: repeat(4, 1fr); } }
+		        /* === СТИЛИ ДЛЯ ПОДСКАЗКИ (БЛОК 5.5b) === */
+        .solution { 
+            text-align: left; 
+            padding: 8px; 
+            background: rgba(0,0,0,0.2); 
+            border-radius: 8px; 
+            margin-top: 5px;
+        }
+        
+        /* Выполненный шаг */
+        .step-done { 
+            color: #4caf50; 
+            opacity: 0.6; 
+            text-decoration: line-through; 
+        }
+        
+        /* Текущий активный шаг */
+        .step-current { 
+            color: #ffd866; 
+            font-weight: bold; 
+            background: rgba(255,216,102,0.15); 
+            border-left: 3px solid #ffd866; 
+            padding: 2px 6px; 
+            border-radius: 4px;
+            transform: scale(1.02);
+            transition: all 0.2s;
+        }
+        
+        /* Ошибочный шаг */
+        .step-error { 
+            color: #ff4444; 
+            animation: shake 0.4s ease-in-out; 
+            border-left: 3px solid #ff4444;
+            padding: 2px 6px;
+        }
+        
+        /* Ожидающий шаг */
+        .step-pending { 
+            color: #aaaaca; 
+            opacity: 0.5; 
+        }
+
+        @keyframes shake { 
+            0%, 100% { transform: translateX(0); } 
+            25% { transform: translateX(-4px); } 
+            75% { transform: translateX(4px); } 
+        }
+		        #ranksPanel { 
+            position: fixed; 
+            inset: 0; 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            background: rgba(0,0,0,0.85); 
+            z-index: 1500; 
+            backdrop-filter: blur(8px); 
+            padding: 20px; 
+        }
+        #ranksPanel.open { display: flex; }
+        .rank-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 12px; 
+            margin: 6px 0; 
+        }
+        .rank-table th { 
+            text-align: left; 
+            padding: 8px 10px; 
+            font-size: 11px; 
+            color: #ffd866; 
+            border-bottom: 2px solid #ffd866; 
+        }
+        .rank-table td { 
+            padding: 7px 10px; 
+            border-bottom: 1px solid #2a2a4a; 
+            color: #ccccee; 
+            font-size: 12px; 
+        }
+        .rank-table tr.current-rank { 
+            background: rgba(255,216,102,0.12); 
+        }
+	        /* Звезды на уровнях */
+        .levels button.completed.stars-1::after { 
+            content: ' ★'; 
+            color: #cd7f32; 
+            font-size: 14px;
+        }
+        .levels button.completed.stars-2::after { 
+            content: ' ★★'; 
+            color: #c0c0c0; 
+            font-size: 14px;
+        }
+        .levels button.completed.stars-3::after { 
+            content: ' ★★★'; 
+            color: #ffd700; 
+            font-size: 14px;
+        }	
+		
+    
+    </style>
+</head>
+<body>
+
+    <div id="startScreen">
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="ru" id="langRuBtn">РУС</button>
+            <span class="lang-divider">|</span>
+            <button class="lang-btn" data-lang="en" id="langEnBtn">ENG</button>
+        </div>
+        <div class="logo-gear"><img src="gear-flat.png" alt="Gear"></div>
+        <div class="start-title" id="startTitle">GEAR PUZZLE</div>
+        <div class="start-subtitle" id="startSubtitle">СОБЕРИ МЕХАНИЗМ</div>
+        <div class="rank-badge" id="startRank">🌱 Новичок</div>
+        <div class="rank-bar-wrap"><div class="rank-bar" id="startRankBar"></div></div>
+        <div class="button-group">
+            <button class="start-btn" id="startPlayBtn"><span id="playText">ИГРАТЬ</span></button>
+            <button class="start-btn" id="startSettingsBtn"><span id="settingsText">НАСТРОЙКИ</span></button>
+            <button class="start-btn" id="startTutorialBtn"><span id="tutorialText">КАК ИГРАТЬ</span></button>
+        </div>
+        <div class="start-footer" id="startVersion">ВЕРСИЯ 3.0</div>
+    </div>
+
+    <main id="game">
+        <header>
+            <div style="display:flex; gap:4px;"><button id="menuBtn">⚙️</button><button id="helpBtn">?</button></div>
+            <span id="levelDisplay" style="color:#ffd866;font-weight:bold;font-size:15px;"><span id="levelLabel">Уровень</span> <span id="level">1</span></span>
+            <span class="stats">
+                <span class="stat-item"><span class="icon">🔄</span><b id="moves">0</b></span>
+                <span class="stat-item"><span class="icon">⭐</span><b id="score">1000</b></span>
+                <span class="stat-item"><span class="icon">⚡</span><b id="energy">100</b></span>
+                <span class="stat-item"><span class="icon">🪙</span><b id="coinsH">0</b></span>
+                <span class="stat-item"><span class="icon">🏆</span><b id="total">0</b></span>
+            </span>
+        </header>
+        <div class="wrap"><canvas id="canvas"></canvas></div>
+        <div id="hintText">👆 <span class="cw" id="hintCW">ПКМ / Правая — по часовой</span> | <span class="ccw" id="hintCCW">ЛКМ / Левая — против</span></div>
+        <div id="info">👆 Нажми на шестерёнку</div>
+        <div id="buttons">
+            <button id="undo">Отмена</button>
+            <button id="reset">Сброс</button>
+            <button id="hint">Подсказка</button>
+            <button id="next" disabled>Следующий</button>
+        </div>
+    </main>
+
+    <div id="panel">
+        <div class="box">
+            <button class="close-btn" id="closePanel">✕</button>
+            <h3 id="menuTitle">⚙️ Меню</h3>
+            <div class="row"><span id="playerLabel">Игрок:</span><span id="profileName">Механик</span></div>
+            <div class="row"><span id="rankLabel">Звание:</span><span id="profileRank" style="color:#ffd866;font-weight:bold;">🌱 Новичок</span></div>
+            <div class="row"><span id="toNextRankLabel">До след. звания:</span><span id="profileRankProg">0 / 200 🪙</span></div>
+            <div class="row"><span id="scoreLabelM">Очки:</span><span id="profileTotalScore">0</span></div>
+            <div class="row"><span id="completedLabel">Пройдено:</span><span id="profileCompleted">0 / 0</span></div>
+            <div class="row"><span id="coinsLabelM">Монет:</span><span id="profileCoins" style="color:#ffd700;font-weight:bold;">0 🪙</span></div>
+            <div class="row"><span id="soundLabel">Звук:</span><input id="soundToggle" type="checkbox" checked></div>
+            <div class="row"><span id="langLabel">Язык:</span><select id="langSelect"><option value="ru">🇷 Русский</option><option value="en">🇬 English</option></select></div>
+
+            <h3 id="privTitle">🎖️ Привилегии звания</h3>
+            <div id="privList" style="font-size:12px;color:#aaaaca;padding:6px 10px;background:#1a1a35;border-radius:8px;"></div>
+
+                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+                <button class="big-btn gold" id="openDaily">🎁 Ежедневный бонус</button>
+                <button class="big-btn blue" id="openAchieve">🏆 Достижения</button>
+                <button class="big-btn gold" id="openRanks">🏅 Звания</button>
+                <button class="big-btn green" id="openEnergyInfo">⚡ Энергия</button>
+            </div>
+
+            <div class="shop-section">
+                <b id="shopTitle">🛒 Магазин</b>
+                <div style="margin:4px 0;display:flex;align-items:center;gap:6px;"><span id="shopCoinsLabel">Монет:</span><span class="coins-display" id="shopCoins">0 🪙</span></div>
+                <button class="shop-btn buy-hint" id="shopHint1">💡 1 подсказка (<span id="price1">30</span> 🪙)</button>
+                <button class="shop-btn buy-hint3" id="shopHint3">💡 3 подсказки (<span id="price3">80</span> 🪙)</button>
+                <button class="shop-btn buy-stars" id="shopStars">⭐ Купить за Telegram Stars</button>
+                <div style="font-size:11px;color:#888;margin-top:6px;"><span id="inStockLabel">Подсказок:</span> <b id="hintStockDisplay">3</b></div>
+            </div>
+
+            <h3 id="shareTitle">📤 Поделиться</h3>
+            <button class="big-btn blue" id="shareBtn">📤 Поделиться игрой</button>
+
+            <h3 id="levelsTitle">📜 Уровни</h3>
+            <div id="levelsContainer" class="levels"></div>
+            <button id="clearProgress" style="width:100%;margin-top:10px;background:#a93652;color:#fff;border:none;border-radius:10px;padding:10px;cursor:pointer;">🗑️ Сбросить прогресс</button>
+        </div>
+    </div>
+
+    <div id="dailyPanel">
+        <div class="box">
+            <button class="close-btn" id="closeDaily">✕</button>
+            <h3>🎁 Ежедневные награды</h3>
+            <p style="font-size:12px;color:#aaaaca;">Заходи каждый день — награды растут! Пропустил день — серия сбросится.</p>
+            <div class="daily-grid" id="dailyGrid"></div>
+            <button class="big-btn gold" id="claimDaily">Забрать награду дня</button>
+        </div>
+    </div>
+
+     <div id="achievePanel">
+        <div class="box">
+            <button class="close-btn" id="closeAchieve">✕</button>
+            <h3>🏆 Достижения</h3>
+            <div id="achieveList"></div>
+        </div>
+    </div>
+
+    <div id="ranksPanel">
+        <div class="box">
+            <button class="close-btn" id="closeRanks">✕</button>
+            <h3 id="ranksTitle">🏅 Все звания</h3>
+            <p id="ranksSubtitle" style="font-size:12px;color:#aaaaca;margin-bottom:10px;">
+                Копи монеты — получай новые звания и привилегии!
+            </p>
+            <div id="ranksTable"></div>
+            <button class="big-btn gold" id="ranksOk">Понятно</button>
+        </div>
+    </div>
+
+    <div id="energyPanel">
+        <div class="box" style="text-align:center;">
+            <h3>⚡ Энергия закончилась</h3>
+            <p style="font-size:13px;color:#ccccee;margin:10px 0;">Подсказки тратят энергию. Восстанови её одним из способов:</p>
+            <button class="big-btn blue" id="energyAd">📺 Смотреть рекламу (+20 ⚡)</button>
+            <button class="big-btn green" id="energyWait">⏳ Подождать (<span id="energyTimer">15:00</span>)</button>
+            <button class="big-btn" id="energyClose" style="background:#444;color:#fff;">Закрыть</button>
+        </div>
+    </div>
+
+    <div id="energyInfoPanel">
+        <div class="box">
+            <button class="close-btn" id="closeEnergyInfo">✕</button>
+            <h3>⚡ Энергия</h3>
+            
+            <div style="margin: 15px 0; padding: 15px; background: #1a1a35; border-radius: 12px; text-align: center;">
+                <div style="font-size: 48px; margin-bottom: 5px;">⚡</div>
+                <div style="font-size: 28px; font-weight: bold; color: #ffd866;" id="energyInfoCurrent">100 / 100</div>
+                <div style="font-size: 13px; color: #aaaaca;">Текущий запас энергии</div>
+            </div>
+            
+            <div style="margin: 10px 0; padding: 12px; background: #1a1a35; border-radius: 10px;">
+                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #2a2a4a;">
+                    <span style="color: #aaaaca;">📊 Максимум:</span>
+                    <span style="color: #ffd866; font-weight: bold;" id="energyInfoMax">100</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #2a2a4a;">
+                    <span style="color: #aaaaca;">⏳ Восстановление:</span>
+                    <span style="color: #4caf50; font-weight: bold;" id="energyInfoRegen">+10 / 15 мин</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #2a2a4a;">
+                    <span style="color: #aaaaca;">🕐 До следующего восстановления:</span>
+                    <span style="color: #ffd866; font-weight: bold;" id="energyInfoTimer">15:00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                    <span style="color: #aaaaca;">💡 Цена подсказки:</span>
+                    <span style="color: #ff8585; font-weight: bold;" id="energyInfoHintCost">10 ⚡</span>
+                </div>
+            </div>
+            
+            <div style="margin: 10px 0; padding: 12px; background: #1a1a35; border-radius: 10px;">
+                <div style="font-size: 13px; color: #ffd866; font-weight: bold; margin-bottom: 6px;">📺 Пополнить энергию:</div>
+                <button class="big-btn blue" id="energyInfoAd">📺 Смотреть рекламу (+20 ⚡)</button>
+                <button class="big-btn green" id="energyInfoWait" style="margin-top: 5px;">⏳ Подождать восстановления</button>
+            </div>
+
+            <div style="margin: 10px 0; padding: 12px; background: #1a1a35; border-radius: 10px;">
+                <div style="font-size: 13px; color: #ffd866; font-weight: bold; margin-bottom: 6px;">🪙 Купить за монеты:</div>
+                <button class="big-btn gold" id="energyBuyCoins20" style="margin-top: 5px;">+20 ⚡ = 25 🪙</button>
+                <button class="big-btn gold" id="energyBuyCoins50" style="margin-top: 5px;">+50 ⚡ = 50 🪙</button>
+                <button class="big-btn gold" id="energyBuyCoins100" style="margin-top: 5px;">+100 ⚡ = 80 🪙</button>
+            </div>
+
+            <div style="margin: 10px 0; padding: 12px; background: #1a1a35; border-radius: 10px;">
+                <div style="font-size: 13px; color: #ffd866; font-weight: bold; margin-bottom: 6px;">⭐ Купить за Telegram Stars:</div>
+                <button class="big-btn blue" id="energyBuyStars50" style="margin-top: 5px;">+50 ⚡ = 1 ⭐</button>
+                <button class="big-btn blue" id="energyBuyStars100" style="margin-top: 5px;">+100 ⚡ = 2 ⭐</button>
+            </div>
+            
+            <button class="big-btn" id="energyInfoClose" style="background: #444; color: #fff; margin-top: 8px;">Закрыть</button>
+        </div>
+    </div>
+    <div id="rankupPanel">
+        <div class="box" style="text-align:center;">
+            <h3 id="rankupTitle">🎉 Новое звание!</h3>
+            <div id="rankupIcon" style="font-size:48px;margin:10px 0;">⚙️</div>
+            <div id="rankupName" style="font-size:22px;color:#ffd866;font-family:'Cinzel',serif;margin-bottom:10px;">Механик</div>
+            <div id="rankupPriv" style="font-size:13px;color:#ccccee;text-align:left;padding:10px;background:#1a1a35;border-radius:10px;"></div>
+            <button class="big-btn gold" id="rankupOk">Отлично!</button>
+        </div>
+    </div>
+
+     <div id="helpPanel">
+        <div class="help-box">
+            <button class="close-btn" id="closeHelp">✕</button>
+            <h2 id="helpTitle">❓ КАК ИГРАТЬ</h2>
+            <p id="helpGoal">🎯 Цель — поворачивать шестерни так, чтобы все числа стали зелёными галочками ✅.</p>
+
+            <div class="help-section"><div class="label" id="helpPCLabel">🖥️ На ПК:</div><ul><li id="helpPC1">Правый клик (ПКМ) — по часовой стрелке.</li><li id="helpPC2">Левый клик (ЛКМ) — против часовой стрелки.</li></ul></div>
+
+            <div class="help-section"><div class="label" id="helpMobileLabel">📱 На смартфоне:</div><ul><li id="helpMobile1">Клик по правой половине шестерни — по часовой стрелке.</li><li id="helpMobile2">Клик по левой половине шестерни — против часовой стрелки.</li></ul></div>
+
+            <div class="help-section"><div class="label">⭐ Звёзды:</div><ul>
+                <li><b>3 звезды</b> — без подсказки, без сброса, ходы ≤ лимиту.</li>
+                <li><b>2 звезды</b> — без подсказки, но был сброс ИЛИ превышен лимит ходов.</li>
+                <li><b>1 звезда</b> — использована подсказка.</li>
+            </ul></div>
+
+            <div class="help-section"><div class="label">📊 Лимит ходов:</div><ul>
+                <li>3 шестерни = <b>10 ходов</b></li>
+                <li>4 шестерни = <b>20 ходов</b></li>
+                <li>5 шестерён = <b>30 ходов</b></li>
+                <li>Если превысить лимит — каждый следующий ход стоит <b>1 ⚡</b> энергии.</li>
+            </ul></div>
+
+            <div class="help-section"><div class="label">⚡ Энергия:</div><ul>
+                <li><b>На что тратится:</b> подсказка (20 ⚡), сброс (5 ⚡), ход сверх лимита (1 ⚡).</li>
+                <li><b>Как восполнить:</b> авто-регенерация (+10 ⚡), реклама (+20 ⚡), покупка за монеты или Stars.</li>
+                <li>Если энергия на нуле — можно делать <b>только ходы в пределах лимита</b>.</li>
+                <li>Чтобы пополнить энергию — открой меню (⚙️) и нажми <b>"Энергия"</b>.</li>
+            </ul></div>
+
+            <div class="help-section"><div class="label">⭐ Очки:</div><ul>
+                <li>Старт: <b>100 очков</b>.</li>
+                <li>Минус <b>1 очко</b> за каждый ход в пределах лимита.</li>
+                <li>Минус <b>5 очков</b> за каждый ход сверх лимита.</li>
+                <li>Пример: лимит 10, прошёл за 12 ходов → 100 − 10 − (2×5) = <b>80 очков</b>.</li>
+                <li>Очки копятся в <b>общий рейтинг</b> игрока.</li>
+            </ul></div>
+
+            <div class="help-section"><div class="label">🪙 Монеты:</div><ul>
+                <li><b>Как заработать:</b> за первое прохождение уровня — 5/10/30 🪙 (за 1/2/3 звезды).</li>
+                <li>За босс-уровни (5, 10, 15...) — дополнительный бонус.</li>
+                <li>Повторное прохождение монеты <b>не даёт</b>.</li>
+                <li><b>На что тратить:</b> подсказки (1=30🪙, 3=80🪙) и энергия (20=25🪙, 50=50🪙, 100=80🪙).</li>
+            </ul></div>
+
+            <div class="help-section"><div class="label">🏅 Звания:</div><ul>
+                <li>Открываются при накоплении <b>определённого количества монет</b>.</li>
+                <li>Дают привилегии: больше энергии, быстрее регенерация, скидки, бесплатные подсказки.</li>
+            </ul></div>
+
+            <div class="help-section"><div class="label">🔒 Замки:</div><ul>
+                <li>Чтобы снять замок — <b>обнули соседние шестерни</b>.</li>
+                <li>Для 3 шестерён достаточно обнулить <b>одну</b> соседнюю.</li>
+                <li>Для 4–5 шестерён нужно обнулить <b>обе</b> соседние.</li>
+            </ul></div>
+
+            <div class="help-section"><div class="label">📺 Реклама:</div><ul>
+                <li><b>На боссах</b> (5, 10, 15...) — обязательная, даёт <b>удвоение монет</b>.</li>
+                <li><b>В панели "Энергия"</b> — добровольная, даёт <b>+20 ⚡</b>.</li>
+                <li><b>Когда энергия на нуле</b> — добровольная, даёт <b>+20 ⚡</b>.</li>
+            </ul></div>
+
+            <div class="help-section"><div class="label">💡 Подсказка:</div><ul>
+                <li>Показывает <b>полный алгоритм</b> решения уровня.</li>
+                <li>Стоит <b>20 ⚡</b> (или бесплатная, если есть от звания).</li>
+                <li>Использование подсказки даёт <b>1 звезду</b>.</li>
+            </ul></div>
+
+            <div class="help-section"><div class="label">🎁 Ежедневные награды:</div><ul>
+                <li>Заходи каждый день — получай <b>растущие бонусы</b>.</li>
+                <li>Пропустил день — <b>серия сбросится</b>.</li>
+            </ul></div>
+
+            <div class="help-section"><div class="label">🏆 Достижения:</div><ul>
+                <li>Выполняй цели — получай <b>награды</b> (монеты, подсказки, энергия).</li>
+            </ul></div>
+
+            <div class="help-section"><div class="label">📤 Поделиться:</div><ul>
+                <li>Поделись игрой с друзьями — зови их в рейтинг!</li>
+            </ul></div>
+
+        </div>
+    </div>
+
+    <div id="tipLayer"><div class="tip-box"><div class="tip-text" id="tipText"></div><button class="tip-ok" id="tipOk">Понятно</button></div></div>
+
+    <script>
+	    /* ============================================================
+       БЛОК 4. JAVASCRIPT — ЯДРО
+       Настройки, Telegram, аналитика, энергия, сохранения, уровни, отрисовка
+       ============================================================ */
+
+  /* --- 4.1. CONFIG (все настройки в одном месте) --- */
+    const CONFIG = {
+        TEST_MODE: false,                 // true — включить читы в консоли
+        LOGICAL_SIZE: 400,                // логический размер canvas
+        ANIM_DURATION_PAIR: 190,          // длительность анимации (3 шестерни)
+        ANIM_DURATION_TRIPLE: 220,        // длительность анимации (4-5 шестерён)
+        CLICK_RADIUS: 54,                 // радиус клика по шестерне
+        CLOUD_KEY: 'gearPuzzleSaveV3',    // ключ сохранения
+        
+        // === НОВЫЕ ПАРАМЕТРЫ ЭНЕРГИИ ===
+        MAX_ENERGY: 100,                  // максимум энергии (базовый)
+        ENERGY_PER_HINT: 20,              // трата за подсказку (было 10)
+        ENERGY_PER_RESET: 5,              // трата за сброс (НОВЫЙ)
+        ENERGY_PER_MOVE_OVER: 1,          // трата за ход сверх лимита (НОВЫЙ)
+        ENERGY_REGEN_MS: 15 * 60 * 1000,  // +10 каждые 15 мин
+        ENERGY_REGEN_AMOUNT: 10,
+        AD_ENERGY_BONUS: 20,              // реклама даёт +20
+        ENERGY_BUY_COINS_20: 25,          // 20 ⚡ за 25 монет (НОВЫЙ)
+        ENERGY_BUY_COINS_50: 50,          // 50 ⚡ за 50 монет (НОВЫЙ)
+        ENERGY_BUY_COINS_100: 80,         // 100 ⚡ за 80 монет (НОВЫЙ)
+        ENERGY_BUY_STARS_50: 1,           // 50 ⚡ за 1 Star (НОВЫЙ)
+        ENERGY_BUY_STARS_100: 2,          // 100 ⚡ за 2 Stars (НОВЫЙ)
+        
+        // === ЛИМИТЫ ХОДОВ (НОВЫЕ) ===
+        MOVE_LIMIT_3: 10,                 // 3 шестерни = 10 ходов
+        MOVE_LIMIT_4: 20,                 // 4 шестерни = 20 ходов
+        MOVE_LIMIT_5: 30,                 // 5 шестерён = 30 ходов
+        
+        // Монеты и цены
+        COIN_REWARD: { 1: 5, 2: 10, 3: 30 },   // монеты за уровень по звёздам
+        BOSS_BONUS: 50,                         // бонус за босса
+        HINT_PRICE_1: 30,                       // цена 1 подсказки
+        HINT_PRICE_3: 80,                       // цена 3 подсказок
+        START_HINT_STOCK: 3,                    // стартовый запас подсказок
+        
+        // Звания: порог накопленных монет + привилегии
+        RANKS: [
+            { key:'novice',    icon:'🌱', name_ru:'Новичок',     name_en:'Novice',   threshold:0,    maxEnergy:100, regenMs:15*60*1000, freeHints:0, secondChance:false, coinBonus:0,   discount:0,    skin:'default' },
+            { key:'mechanic',  icon:'⚙️', name_ru:'Механик',     name_en:'Mechanic', threshold:200,  maxEnergy:110, regenMs:15*60*1000, freeHints:0, secondChance:false, coinBonus:0,   discount:0.10, skin:'copper' },
+            { key:'master',    icon:'🔧', name_ru:'Мастер',      name_en:'Master',   threshold:600,  maxEnergy:110, regenMs:12*60*1000, freeHints:1, secondChance:false, coinBonus:0,   discount:0.10, skin:'bronze' },
+            { key:'expert',    icon:'👑', name_ru:'Эксперт',     name_en:'Expert',   threshold:1500, maxEnergy:120, regenMs:12*60*1000, freeHints:1, secondChance:true,  coinBonus:0.20,discount:0.15, skin:'silver' },
+            { key:'legend',    icon:'🏆', name_ru:'Легенда',     name_en:'Legend',   threshold:3000, maxEnergy:130, regenMs:10*60*1000, freeHints:2, secondChance:true,  coinBonus:0.30,discount:0.20, skin:'gold' }
+        ],
+        
+        // Реклама (заглушка + анти-спам)
+        AD_PROVIDER: null,
+        AD_COOLDOWN_MS: 3 * 60 * 1000,    // не чаще 1 раза в 3 мин
+        AD_MAX_PER_SESSION: 7,            // максимум реклам за сессию
+        AD_FREE_LEVELS: 3,                // никаких реклам в первых N уровнях
+        AD_TIMER_MS: 30 * 60 * 1000,      // таймер-бонус раз в 30 мин
+        
+        // Telegram Stars
+        STARS_INVOICE_URL: '',            // сюда вставишь ссылку-счёт от бота
+        STARS_HINT_AMOUNT: 5,             // подсказок за одну покупку
+        STARS_INVOICE_URL_ENERGY_50: '',  // для покупки 50 ⚡ (НОВЫЙ)
+        STARS_INVOICE_URL_ENERGY_100: ''  // для покупки 100 ⚡ (НОВЫЙ)
+    };
+
+/* --- 4.2. Telegram WebApp (haptic, share, alert, тема) --- */
+    const TG = window.Telegram?.WebApp;
+    const isTelegram = !!TG;
+    if (isTelegram) {
+        try {
+            TG.ready(); TG.expand();
+            const tp = TG.themeParams || {};
+            if (tp.bg_color) document.body.style.background = tp.bg_color;
+        } catch (e) {}
+    }
+    function haptic(type = 'light') {
+        if (!isTelegram || !TG.HapticFeedback) return;
+        try {
+            if (type === 'success') TG.HapticFeedback.notificationOccurred('success');
+            else if (type === 'error') TG.HapticFeedback.notificationOccurred('error');
+            else if (type === 'warning') TG.HapticFeedback.notificationOccurred('warning');
+            else TG.HapticFeedback.impactOccurred(type);
+        } catch (e) {}
+    }
+    function tgAlert(message, callback) {
+        if (isTelegram && TG.showPopup) {
+            try { TG.showPopup({ message }, () => { if (callback) callback(true); }); return; } catch (e) {}
+        }
+        if (callback) callback(confirm(message)); else alert(message);
+    }
+    function tgShare(text, url) {
+        if (isTelegram && TG.switchInlineQuery) {
+            try { TG.switchInlineQuery(text + ' ' + (url||''), ['users','groups','channels']); return true; } catch (e) {}
+        }
+        return false;
+    }
+
+    /* --- 4.3. Аналитика (trackEvent + свойства игрока) --- */
+    function trackEvent(name, params = {}) {
+        try {
+            if (typeof ym === 'function') {
+                ym(111640186, 'reachGoal', name, params);
+            }
+        } catch (e) {}
+    }
+    function getStartParam() {
+        // метка источника из Telegram (?startapp=...) или из URL
+        try {
+            if (isTelegram && TG.initDataUnsafe?.start_param) return TG.initDataUnsafe.start_param;
+        } catch (e) {}
+        try {
+            const p = new URLSearchParams(location.search);
+            return p.get('startapp') || p.get('source') || '';
+        } catch (e) { return ''; }
+    }
+    function detectPlatform() { return isTelegram ? 'telegram' : 'browser'; }
+
+      /* --- 4.4. Состояние игры (state) --- */
+    let state = {
+        level: 1, unlocked: 1, moves: 0, score: 1000, total: 0,
+        coins: 0, hintStock: CONFIG.START_HINT_STOCK,
+        energy: CONFIG.MAX_ENERGY, lastEnergyTime: Date.now(),
+        gears: [], history: [], solved: false, animating: false, winShown: false,
+        usedReset: false, levelUsedHint: false,
+        bestScores: {}, bestStars: {}, playerName: 'Механик', soundEnabled: true,
+        currentLang: 'ru',
+        // состояние пошаговой подсказки
+        hintGroups: [],
+        hintGroupIndex: 0,
+        hintProgress: 0,
+        hintActive: false,
+        hintError: false,
+        // удержание
+        dailyStreak: 0, lastDailyClaim: 0,
+        achievements: {},
+        activeSkin: 'default',
+        // статистика для достижений
+        totalLevelsCompleted: 0, totalPerfect: 0, totalLocksOpened: 0,
+        levelsWithoutHint: 0, playDays: {},
+        // реклама
+        adCountSession: 0, lastAdTime: 0, lastAdTimerBonus: 0, isPayer: false,
+        // тултипы (показаны ли)
+        shownTips: {},
+        // ежедневные бесплатные подсказки (сбрасываются по дню)
+        freeHintsUsedToday: 0, lastFreeHintDay: 0,
+        secondChanceUsedToday: 0, lastSecondChanceDay: 0
+    };
+    let audioContext = null, animationId = null, winAnimationRunning = false;
+    const $ = id => document.getElementById(id);
+    const canvas = $('canvas'); const ctx = canvas.getContext('2d');
+
+    /* --- 4.5. Графика: картинка шестерни + скины --- */
+    let gearImage = null, gearImageReady = false;
+    gearImage = new Image();
+    gearImage.onload = () => { gearImageReady = true; draw(); };
+    gearImage.onerror = () => { gearImageReady = false; };
+    gearImage.src = 'gear-flat.png';
+    // Цвета скинов (косметика, не влияет на геймплей)
+    const SKIN_COLORS = {
+        default: ['#f2cf76', '#b8860b'],
+        copper:  ['#e8a862', '#a85a1e'],
+        bronze:  ['#cd9b5a', '#8a5a22'],
+        silver:  ['#d8dce6', '#8a90a0'],
+        gold:    ['#ffe27a', '#d4a017']
+    };
+
+    /* --- 4.6. Геометрия уровней --- */
+    const POSITIONS_3 = [{ x: 200, y: 120 }, { x: 270, y: 280 }, { x: 130, y: 280 }];
+    const POSITIONS_4 = [{ x: 200, y: 78 }, { x: 310, y: 200 }, { x: 200, y: 322 }, { x: 90, y: 200 }];
+    const POSITIONS_5 = [{ x: 200, y: 78 }, { x: 314, y: 147 }, { x: 270, y: 275 }, { x: 130, y: 275 }, { x: 86, y: 147 }];
+    const TEETH_3 = [ [8,10,12],[6,9,12],[8,12,16],[10,14,18],[6,8,10] ];
+    const TEETH_4 = [ [8,10,12,14],[6,8,10,12],[8,10,14,16],[10,12,14,16],[6,9,12,17] ];
+    const TEETH_5 = [ [6,8,10,12,14],[8,10,12,14,16],[6,9,12,15,18],[8,11,14,17,20],[6,8,10,14,17] ];
+
+    function setupCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        const cssWidth = rect.width || CONFIG.LOGICAL_SIZE;
+        const cssHeight = rect.height || CONFIG.LOGICAL_SIZE;
+        canvas.width = cssWidth * dpr; canvas.height = cssHeight * dpr;
+        ctx.setTransform(1,0,0,1,0,0);
+        ctx.scale((cssWidth*dpr)/CONFIG.LOGICAL_SIZE, (cssHeight*dpr)/CONFIG.LOGICAL_SIZE);
+    }
+    window.addEventListener('resize', () => { setupCanvas(); draw(); });
+
+    /* --- 4.7. Звания: получение текущего ранга и его бонусов --- */
+    function getRank() {
+        let r = CONFIG.RANKS[0];
+        for (const rank of CONFIG.RANKS) { if (state.coins >= rank.threshold) r = rank; }
+        return r;
+    }
+    function getNextRank() {
+        for (const rank of CONFIG.RANKS) { if (state.coins < rank.threshold) return rank; }
+        return null;
+    }
+    function rankName(r) { return state.currentLang === 'en' ? r.name_en : r.name_ru; }
+
+    /* --- 4.8. Энергия: регенерация, трата, таймер --- */
+    function regenEnergy() {
+        const r = getRank();
+        const cap = r.maxEnergy;
+        const now = Date.now();
+        const elapsed = now - (state.lastEnergyTime || now);
+        const gained = Math.floor(elapsed / r.regenMs) * CONFIG.ENERGY_REGEN_AMOUNT;
+        if (gained > 0 && state.energy < cap) {
+            state.energy = Math.min(cap, state.energy + gained);
+            state.lastEnergyTime = now - (elapsed % r.regenMs);
+        } else if (state.energy >= cap) {
+            state.lastEnergyTime = now;
+        }
+    }
+    function useEnergyForHint() {
+        regenEnergy();
+        if (state.energy < CONFIG.ENERGY_PER_HINT) return false;
+        state.energy -= CONFIG.ENERGY_PER_HINT;
+        return true;
+    }
+    function addEnergy(amount) { regenEnergy(); state.energy = Math.min(getRank().maxEnergy, state.energy + amount); }
+    function timeUntilNextEnergy() {
+        regenEnergy();
+        if (state.energy >= getRank().maxEnergy) return 0;
+        const elapsed = Date.now() - state.lastEnergyTime;
+        return Math.max(0, getRank().regenMs - elapsed);
+    }
+    function formatTime(ms) { const s = Math.ceil(ms/1000); const m = Math.floor(s/60); const ss = s%60; return `${m}:${ss<10?'0':''}${ss}`; }
+
+    /* --- 4.9. Сохранения (CloudStorage + localStorage) --- */
+    function getSaveData() {
+        return {
+            level: state.level, unlocked: state.unlocked, total: state.total, coins: state.coins,
+            hintStock: state.hintStock, energy: state.energy, lastEnergyTime: state.lastEnergyTime,
+            bestScores: state.bestScores, bestStars: state.bestStars, playerName: state.playerName,
+            soundEnabled: state.soundEnabled, currentLang: state.currentLang,
+            dailyStreak: state.dailyStreak, lastDailyClaim: state.lastDailyClaim,
+            achievements: state.achievements, activeSkin: state.activeSkin,
+            totalLevelsCompleted: state.totalLevelsCompleted, totalPerfect: state.totalPerfect,
+            totalLocksOpened: state.totalLocksOpened, levelsWithoutHint: state.levelsWithoutHint,
+            playDays: state.playDays, shownTips: state.shownTips, isPayer: state.isPayer,
+            currentLevel: state.level, values: state.gears.map(g => g.value),
+            moves: state.moves, score: state.score, usedReset: state.usedReset,
+            levelUsedHint: state.levelUsedHint, locked: state.gears.map(g => g.locked)
+        };
+    }
+    function applySaveData(saved) {
+        if (!saved) return;
+        state.level = Number(saved.level)||1; state.unlocked = Number(saved.unlocked)||1;
+        state.total = Number(saved.total)||0; state.coins = Number(saved.coins)||0;
+        state.hintStock = Number(saved.hintStock) ?? CONFIG.START_HINT_STOCK;
+        state.energy = Number(saved.energy) ?? CONFIG.MAX_ENERGY;
+        state.lastEnergyTime = Number(saved.lastEnergyTime) || Date.now();
+        state.bestScores = saved.bestScores||{}; state.bestStars = saved.bestStars||{};
+        state.playerName = saved.playerName||'Механик'; state.soundEnabled = saved.soundEnabled !== false;
+        state.currentLang = saved.currentLang||'ru';
+        state.dailyStreak = Number(saved.dailyStreak)||0;
+       state.lastDailyClaim = saved.lastDailyClaim || 0; // Убрали Number(), так как дата — это строка
+        state.achievements = saved.achievements||{};
+        state.activeSkin = saved.activeSkin||'default';
+        state.totalLevelsCompleted = Number(saved.totalLevelsCompleted)||0;
+        state.totalPerfect = Number(saved.totalPerfect)||0;
+        state.totalLocksOpened = Number(saved.totalLocksOpened)||0;
+        state.levelsWithoutHint = Number(saved.levelsWithoutHint)||0;
+        state.playDays = saved.playDays||{};
+        state.shownTips = saved.shownTips||{};
+        state.isPayer = Boolean(saved.isPayer);
+        state.levelUsedHint = Boolean(saved.levelUsedHint);
+    }
+    function saveGame() {
+        const d = JSON.stringify(getSaveData());
+        try { localStorage.setItem(CONFIG.CLOUD_KEY, d); } catch (e) {}
+        if (isTelegram && TG.CloudStorage) { try { TG.CloudStorage.setItem(CONFIG.CLOUD_KEY, d, ()=>{}); } catch (e) {} }
+    }
+    function loadLocal() { try { return JSON.parse(localStorage.getItem(CONFIG.CLOUD_KEY)); } catch { return null; } }
+    function loadGame(cb) {
+        if (isTelegram && TG.CloudStorage) {
+            try {
+                TG.CloudStorage.getItem(CONFIG.CLOUD_KEY, (err, val) => {
+                    let c = null; if (!err && val) { try { c = JSON.parse(val); } catch (e) {} }
+                    cb(c || loadLocal());
+                }); return;
+            } catch (e) {}
+        }
+        cb(loadLocal());
+    }
+    function clearAllProgress() {
+        try { localStorage.removeItem(CONFIG.CLOUD_KEY); } catch (e) {}
+        if (isTelegram && TG.CloudStorage) { try { TG.CloudStorage.removeItem(CONFIG.CLOUD_KEY, ()=>{}); } catch (e) {} }
+    }
+
+    /* --- 4.10. Генерация уровней --- */
+    function getLevelConfig(n) {
+        let tc, mc, lc = 0;
+        if (n<=5){tc=3;mc=4+Math.floor((n-1)*1.1);} else if (n<=8){tc=3;mc=6+Math.floor((n-5)*1.2);}
+        else if (n<=10){tc=4;mc=8+Math.floor((n-9)*1.2);} else if (n<=13){tc=4;mc=10+Math.floor((n-9)*1.2);}
+        else if (n<=16){tc=4;mc=12+Math.floor((n-13)*1.3);} else if (n<=18){tc=4;mc=14+Math.floor((n-16)*1.4);}
+        else if (n<=21){tc=5;mc=14+Math.floor((n-19)*1.4);} else if (n<=25){tc=5;mc=16+Math.floor((n-22)*1.5);}
+        else if (n<=28){tc=5;mc=20+Math.floor((n-27)*1.2);} else if (n<=35){tc=5;mc=24+Math.floor((n-28)*1.1);}
+        else if (n<=40){tc=5;mc=Math.min(35,28+Math.floor((n-35)*0.5));} else {tc=5;mc=Math.min(35,30+Math.floor((n-40)*0.3));}
+        mc = Math.min(mc, 35);
+        const ml = (tc>=5)?2:1; const r = Math.random();
+        if (tc===3) lc=(r<0.2)?1:0; else if (tc===4) lc=(r<0.3)?1:0;
+        else { if (r<0.3) lc=0; else if (r<0.7) lc=1; else lc=2; }
+        if (lc>ml) lc=ml;
+        return { teethCount: tc, movesCount: mc, isSpecial: n%5===0, lockCount: lc };
+    }
+    function mod(v, n) { return ((v%n)+n)%n; }
+    function getTeeth(n) {
+        const c = getLevelConfig(n).teethCount; let s, i;
+        if (c===3){s=TEETH_3;i=(n-1)%s.length;} else if (c===4){s=TEETH_4;i=(n-9)%s.length;} else {s=TEETH_5;i=(n-19)%s.length;}
+        if (i<0) i+=s.length; if (!s[i]) i=0; return s[i].slice();
+    }
+    function getPositions(c) { if (c===3) return POSITIONS_3; if (c===4) return POSITIONS_4; return POSITIONS_5; }
+    function createGear(x, y, teeth, value, label) { return { x,y,teeth,value,label,angle:0,active:false,hint:false,speed:0,locked:false }; }
+    function applyMove3(s,i,d,teeth){ const r=s.slice(),p=d==='cw'?(i+1)%3:(i+2)%3; if(d==='cw'){r[i]=mod(r[i]-1,teeth[i]);r[p]=mod(r[p]+1,teeth[p]);}else{r[i]=mod(r[i]+1,teeth[i]);r[p]=mod(r[p]-1,teeth[p]);} return r; }
+    function applyMove4(s,i,d,teeth){ const r=s.slice(),n=teeth.length,nx=(i+1)%n,pv=(i-1+n)%n; if(d==='cw'){r[i]=mod(r[i]-1,teeth[i]);r[nx]=mod(r[nx]+1,teeth[nx]);r[pv]=mod(r[pv]-1,teeth[pv]);}else{r[i]=mod(r[i]+1,teeth[i]);r[nx]=mod(r[nx]-1,teeth[nx]);r[pv]=mod(r[pv]+1,teeth[pv]);} return r; }
+    function applyMove5(s,i,d,teeth){ return applyMove4(s,i,d,teeth); }
+    function randomState(teeth, count) {
+        let s = new Array(teeth.length).fill(0);
+        for (let j=0;j<count;j++){ const i=Math.floor(Math.random()*teeth.length), d=Math.random()<0.5?'cw':'ccw';
+            if (teeth.length===3) s=applyMove3(s,i,d,teeth); else if (teeth.length===4) s=applyMove4(s,i,d,teeth); else s=applyMove5(s,i,d,teeth); }
+        return s;
+    }
+
+    /* --- 4.11. Отрисовка --- */
+    function draw() {
+        ctx.clearRect(0, 0, CONFIG.LOGICAL_SIZE, CONFIG.LOGICAL_SIZE);
+        ctx.strokeStyle = 'rgba(52,52,91,0.4)'; ctx.lineWidth = 3;
+        for (let i=0;i<state.gears.length;i++){ const a=i,b=(i+1)%state.gears.length; if(!state.gears[a]||!state.gears[b]) continue;
+            ctx.beginPath(); ctx.moveTo(state.gears[a].x,state.gears[a].y); ctx.lineTo(state.gears[b].x,state.gears[b].y); ctx.stroke(); }
+        state.gears.forEach(drawGear);
+    }
+    function drawGear(gear) {
+        ctx.save();
+        ctx.translate(gear.x, gear.y);
+        ctx.rotate(gear.angle * Math.PI / 180);
+        const radius = 42; const teeth = gear.teeth;
+        const skin = SKIN_COLORS[state.activeSkin] || SKIN_COLORS.default;
+        ctx.shadowColor = gear.hint ? '#67e8ff' : (gear.active ? '#ffd866' : '#000');
+        ctx.shadowBlur = (gear.hint || gear.active) ? 25 : 12;
+        if (gearImageReady && state.activeSkin === 'default') {
+            const size = 120; ctx.drawImage(gearImage, -size/2, -size/2, size, size);
+        } else {
+            const grad = ctx.createRadialGradient(0,0,10,0,0,radius);
+            if (gear.locked){ grad.addColorStop(0,'#888'); grad.addColorStop(1,'#444'); }
+            else { grad.addColorStop(0, skin[0]); grad.addColorStop(1, skin[1]); }
+            ctx.fillStyle = grad;
+            for (let i=0;i<teeth;i++){ ctx.save(); ctx.rotate(i*Math.PI*2/teeth); ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(-5, radius-6, 10, 16, 3); else ctx.rect(-5, radius-6, 10, 16); ctx.fill(); ctx.restore(); }
+            ctx.beginPath(); ctx.arc(0,0,radius,0,Math.PI*2); ctx.fill();
+        }
+        ctx.restore();
+        ctx.fillStyle = '#101022'; ctx.beginPath(); ctx.arc(gear.x, gear.y, 20, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = '#ffd866'; ctx.lineWidth = 2; ctx.stroke();
+        const fontSize = Math.max(16, Math.min(28, CONFIG.LOGICAL_SIZE*0.07));
+        const labelFontSize = Math.max(11, Math.min(14, CONFIG.LOGICAL_SIZE*0.035));
+        ctx.fillStyle = gear.value === 0 ? '#32e87d' : '#fff';
+        ctx.font = `bold ${fontSize}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(gear.value === 0 ? '✓' : gear.value, gear.x, gear.y);
+        ctx.fillStyle = '#ffd700'; ctx.font = `bold ${labelFontSize}px Arial`;
+        ctx.fillText(gear.label + gear.teeth, gear.x, gear.y - (gearImageReady && state.activeSkin==='default' ? 26 : 30));
+        ctx.strokeStyle = gear.hint ? '#67e8ff' : (gear.value === 0 ? '#2ecc71' : '#f0b34b');
+        ctx.lineWidth = gear.hint ? 4 : 2;
+        ctx.beginPath(); ctx.arc(gear.x, gear.y, gearImageReady && state.activeSkin==='default' ? 46 : 55, 0, Math.PI*2); ctx.stroke();
+        if (gear.locked){ ctx.save(); ctx.fillStyle='#ff4444'; ctx.font='26px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🔒', gear.x, gear.y-58); ctx.restore(); }
+    }
+  
+
+    /* ============================================================
+       БЛОК 5. JAVASCRIPT — МЕХАНИКА, ПОДСКАЗКА, ЗВУК, ПОБЕДА
+       Анимации, ходы, BFS-решение, звук, окно победы
+       ============================================================ */
+
+    /* --- 5.1. Анимации вращения --- */
+    function stopWinAnimation() { winAnimationRunning = false; if (animationId) { cancelAnimationFrame(animationId); animationId = null; } }
+    function animatePair(first, second, direction, done) {
+        state.animating = true; first.active = true; second.active = true;
+        const start = performance.now();
+        const fs = first.angle, ss = second.angle;
+        const fe = fs + (direction==='cw' ? 360/first.teeth : -360/first.teeth);
+        const se = ss + (direction==='cw' ? -360/second.teeth : 360/second.teeth);
+        function frame(time) {
+            const p = Math.min(1, (time-start)/CONFIG.ANIM_DURATION_PAIR);
+            const sm = 1 - Math.pow(1-p, 3);
+            first.angle = fs + (fe-fs)*sm; second.angle = ss + (se-ss)*sm; draw();
+            if (p < 1) requestAnimationFrame(frame);
+            else { first.angle = mod(first.angle,360); second.angle = mod(second.angle,360); first.active=false; second.active=false; state.animating=false; done(); }
+        }
+        requestAnimationFrame(frame);
+    }
+    function animateTriple(selected, next, previous, direction, done) {
+        state.animating = true; const start = performance.now();
+        const sign = direction==='cw' ? 1 : -1;
+        const items = [[selected, sign],[next, -sign],[previous, sign]];
+        const starts = items.map(i => i[0].angle);
+        const ends = items.map((it,idx) => starts[idx] + it[1]*360/it[0].teeth);
+        items.forEach(i => i[0].active = true);
+        function frame(time) {
+            const p = Math.min(1, (time-start)/CONFIG.ANIM_DURATION_TRIPLE);
+            const sm = 1 - Math.pow(1-p, 3);
+            items.forEach((it,idx) => { it[0].angle = starts[idx] + (ends[idx]-starts[idx])*sm; }); draw();
+            if (p < 1) requestAnimationFrame(frame);
+            else { items.forEach(i => { i[0].angle = mod(i[0].angle,360); i[0].active=false; }); state.animating=false; done(); }
+        }
+        requestAnimationFrame(frame);
+    }
+    function startWinAnimation() {
+        if (winAnimationRunning) return; winAnimationRunning = true;
+        state.gears.forEach((g,i) => g.speed = 1.1 + i*0.8);
+        function frame() {
+            if (!state.solved || !winAnimationRunning) { winAnimationRunning = false; return; }
+            state.gears.forEach(g => g.angle = mod(g.angle + g.speed, 360)); draw();
+            animationId = requestAnimationFrame(frame);
+        }
+        frame();
+    }
+
+    /* --- 5.2. Звук --- */
+    function getAudio() {
+        if (!audioContext) { const A = window.AudioContext || window.webkitAudioContext; if (!A) return null; audioContext = new A(); }
+        if (audioContext.state === 'suspended') audioContext.resume(); return audioContext;
+    }
+    function tone(freq, dur=0.08, vol=0.03, delay=0) {
+        if (!state.soundEnabled) return; const a = getAudio(); if (!a) return;
+        const st = a.currentTime + delay; const o = a.createOscillator(), g = a.createGain();
+        o.frequency.value = freq; g.gain.setValueAtTime(vol, st); g.gain.exponentialRampToValueAtTime(0.001, st+dur);
+        o.connect(g); g.connect(a.destination); o.start(st); o.stop(st+dur);
+    }
+    function moveSound(){ tone(175,0.07,0.035); }
+    function winSound(){ tone(330,0.12,0.04); tone(440,0.14,0.04,0.1); tone(660,0.22,0.045,0.22); }
+    function errorSound(){ tone(120,0.15,0.03); }
+    function coinSound(){ tone(880,0.08,0.025); setTimeout(()=>tone(1100,0.1,0.025),100); }
+
+/* --- 5.3. Уровни: старт, ход, завершение хода --- */
+    function startLevel(levelNumber, savedData = null) {
+        stopWinAnimation(); hideTelegramNextButton();
+        state.level = levelNumber;
+        const teeth = getTeeth(levelNumber);
+        const positions = getPositions(teeth.length);
+        const config = getLevelConfig(levelNumber);
+        let values = levelNumber === 1 ? [3,5,2] : randomState(teeth, config.movesCount);
+        if (values.every(v => v === 0)) {
+            const idx = Math.floor(Math.random()*teeth.length), d = Math.random()<0.5?'cw':'ccw';
+            if (teeth.length===3) values = applyMove3(values,idx,d,teeth);
+            else if (teeth.length===4) values = applyMove4(values,idx,d,teeth);
+            else values = applyMove5(values,idx,d,teeth);
+        }
+        state.gears = teeth.map((tv,i) => createGear(positions[i].x, positions[i].y, tv, values[i], String.fromCharCode(65+i)));
+        state.gears.forEach(g => g.locked = false);
+        
+        // 🔒 Расстановка замков с проверкой на соседние
+        let locksToPlace = config.lockCount;
+        let placed = 0, attempts = 0;
+        let lockedPositions = new Set();
+        
+        while (placed < locksToPlace && attempts < 100) {
+            const idx = Math.floor(Math.random() * state.gears.length);
+            
+            // Проверяем, не занята ли уже эта позиция
+            if (lockedPositions.has(idx)) {
+                attempts++;
+                continue;
+            }
+            
+            // Проверка: нет ли замка на соседних шестернях
+            const prevIdx = (idx - 1 + state.gears.length) % state.gears.length;
+            const nextIdx = (idx + 1) % state.gears.length;
+            
+            if (lockedPositions.has(prevIdx) || lockedPositions.has(nextIdx)) {
+                attempts++;
+                continue;
+            }
+            
+            // Если всё ок — ставим замок
+            state.gears[idx].locked = true;
+            lockedPositions.add(idx);
+            placed++;
+            attempts++;
+        }
+        
+        document.querySelector('.win')?.remove();
+        state.moves = 0; state.score = 1000; state.history = [];
+        state.solved = false; state.animating = false; state.winShown = false;
+        state.usedReset = false; state.levelUsedHint = false;
+        
+        // === НОВОЕ: ЛИМИТ ХОДОВ ===
+        const teethCount = state.gears.length;
+        if (teethCount === 3) state.moveLimit = CONFIG.MOVE_LIMIT_3;
+        else if (teethCount === 4) state.moveLimit = CONFIG.MOVE_LIMIT_4;
+        else state.moveLimit = CONFIG.MOVE_LIMIT_5;
+        
+        // Сброс состояния подсказки при старте уровня
+        resetHintState();
+
+        if (savedData && savedData.currentLevel === levelNumber && Array.isArray(savedData.values)) {
+            const hasOnlyZeros = savedData.values.every(v => v === 0);
+            if (!hasOnlyZeros) {
+                state.gears.forEach((g,i) => g.value = savedData.values[i]);
+                state.moves = Number(savedData.moves)||0;
+                state.score = typeof savedData.score === 'number' ? savedData.score : 1000;
+                state.usedReset = Boolean(savedData.usedReset);
+                state.levelUsedHint = Boolean(savedData.levelUsedHint);
+                if (savedData.locked) state.gears.forEach((g,i) => g.locked = savedData.locked[i]);
+            }
+        }
+        updateUI(); setupCanvas(); draw(); saveGame();
+        trackEvent('level_start', { level: levelNumber, gears: teeth.length, locks: config.lockCount, boss: config.isSpecial ? 1 : 0 });
+    }
+
+/* --- 5.3b. Ход игрока (с валидацией подсказки) --- */
+    function makeMove(index, direction) {
+        if (state.solved || state.animating) return;
+        if (state.gears[index] && state.gears[index].locked) { showNotification(t('gearLocked'), 'error'); haptic('error'); return; }
+
+        // === НОВОЕ: ПРОВЕРКА ЭНЕРГИИ ПРИ ХОДЕ СВЕРХ ЛИМИТА ===
+        if (state.moves >= state.moveLimit && state.gears.length > 0) {
+            regenEnergy();
+            if (state.energy < CONFIG.ENERGY_PER_MOVE_OVER) {
+                showNotification('⚡ Недостаточно энергии для хода сверх лимита!', 'error');
+                haptic('error');
+                return;
+            }
+            state.energy -= CONFIG.ENERGY_PER_MOVE_OVER;
+        }
+
+        // валидация по активной подсказке
+        if (state.hintActive && state.hintGroups.length > 0 && state.hintGroupIndex < state.hintGroups.length) {
+            const currentGroup = state.hintGroups[state.hintGroupIndex];
+            if (currentGroup.index === index && currentGroup.direction === direction) {
+                // правильный ход
+                state.hintProgress++;
+                if (state.hintProgress >= currentGroup.count) {
+                    state.hintGroupIndex++; state.hintProgress = 0;
+                    state.gears.forEach(g => g.hint = false);
+                    if (state.hintGroupIndex < state.hintGroups.length) {
+                        state.gears[state.hintGroups[state.hintGroupIndex].index].hint = true;
+                    } else { state.hintActive = false; }
+                }
+                state.hintError = false; updateHintDisplay();
+            } else {
+                // неправильный ход — шестерня НЕ крутится, только ошибка
+                state.hintError = true;
+                state.gears.forEach(g => g.hint = false);
+                state.gears[index].hint = true;
+                updateHintDisplay(); errorSound();
+                showNotification(t('wrongGear'), 'error'); haptic('error');
+                return;
+            }
+        }
+
+        state.history.push(saveState());
+        if (state.gears.length === 3) {
+            const partnerIdx = direction==='cw' ? (index+1)%3 : (index+2)%3;
+            const gear = state.gears[index], partner = state.gears[partnerIdx];
+            if (direction==='cw'){ gear.value=mod(gear.value-1,gear.teeth); partner.value=mod(partner.value+1,partner.teeth); }
+            else { gear.value=mod(gear.value+1,gear.teeth); partner.value=mod(partner.value-1,partner.teeth); }
+            state.moves++; state.score = Math.max(0, 1000 - state.moves*50);
+            haptic('light'); animatePair(gear, partner, direction, finishMove);
+        } else {
+            const n = state.gears.length;
+            const sel = state.gears[index], nx = state.gears[(index+1)%n], pv = state.gears[(index-1+n)%n];
+            if (direction==='cw'){ sel.value=mod(sel.value-1,sel.teeth); nx.value=mod(nx.value+1,nx.teeth); pv.value=mod(pv.value-1,pv.teeth); }
+            else { sel.value=mod(sel.value+1,sel.teeth); nx.value=mod(nx.value-1,nx.teeth); pv.value=mod(pv.value+1,pv.teeth); }
+            state.moves++; state.score = Math.max(0, 1000 - state.moves*50);
+            haptic('light'); animateTriple(sel, nx, pv, direction, finishMove);
+        }
+    }
+
+    function finishMove() {
+        // Сброс подсказки при завершении хода (особенно важно при победе)
+        if (state.solved) resetHintState();
+
+        let anyUnlocked = false; const count = state.gears.length;
+        state.gears.forEach((gear, index) => {
+            if (gear.locked) {
+                const prev = state.gears[(index-1+count)%count], next = state.gears[(index+1)%count];
+                let shouldUnlock = false;
+                if (count === 3) { if (prev.value===0 || next.value===0) shouldUnlock = true; }
+                else { if (prev.value===0 && next.value===0) shouldUnlock = true; }
+                if (shouldUnlock) {
+                    gear.locked = false; anyUnlocked = true; state.totalLocksOpened++;
+                    showNotification(t('gearUnlocked', gear.label), 'success'); tone(600,0.1,0.05); haptic('medium');
+                    trackEvent('gear_unlocked', { level: state.level, gear: gear.label });
+                    checkAchievements();
+                }
+            }
+        });
+        if (anyUnlocked) draw();
+        if (state.gears.every(g => g.value === 0)) {
+            state.solved = true; state.animating = false;
+            saveGame(); draw(); setTimeout(showWin, 250); return;
+        }
+        updateUI(); saveGame();
+    }
+
+    function saveState() { return { values: state.gears.map(g=>g.value), angles: state.gears.map(g=>g.angle), moves: state.moves, score: state.score, locked: state.gears.map(g=>g.locked) }; }
+    
+    function restoreState(s) {
+        state.gears.forEach((g,i) => { g.value=s.values[i]; g.angle=s.angles[i]; g.locked=s.locked[i]; g.active=false; });
+        state.moves = s.moves; state.score = s.score; 
+        // Сброс подсказки при отмене хода
+        resetHintState();
+        haptic('light'); updateUI(); draw(); saveGame();
+    }
+
+/* --- Функция полного сброса состояния подсказки --- */
+    function resetHintState() {
+        state.hintActive = false;
+        state.hintGroups = [];
+        state.hintGroupIndex = 0;
+        state.hintProgress = 0;
+        state.hintError = false;
+        state.gears.forEach(g => g.hint = false);
+        updateHintDisplay();
+    }
+
+ /* --- 5.4. Подсказка (BFS + пошаговая валидация) --- */
+    function findSolution() {
+        const teeth = state.gears.map(g => g.teeth);
+        const startValues = state.gears.map(g => g.value);
+        const startLocked = state.gears.map(g => g.locked);
+        if (startValues.every(v => v === 0)) return [];
+        function getKey(vals, locks){ return vals.join(',')+'|'+locks.map(l=>l?1:0).join(','); }
+        function checkUnlock(vals, locks){ const nl=locks.slice(), c=vals.length;
+            for (let i=0;i<c;i++){ if (nl[i]){ const p=vals[(i-1+c)%c], n=vals[(i+1)%c];
+                if (c===3 ? (p===0||n===0) : (p===0&&n===0)) nl[i]=false; } } return nl; }
+        const queue = [{values:startValues, locked:startLocked}];
+        const parents = new Map(); const startKey = getKey(startValues, startLocked);
+        parents.set(startKey, null); let ptr=0, finalKey=null;
+        while (ptr < queue.length && !finalKey) {
+            const cur = queue[ptr++];
+            for (let idx=0; idx<teeth.length && !finalKey; idx++){ if (cur.locked[idx]) continue;
+                for (const dir of ['cw','ccw']){ let nv;
+                    if (teeth.length===3) nv=applyMove3(cur.values,idx,dir,teeth);
+                    else if (teeth.length===4) nv=applyMove4(cur.values,idx,dir,teeth);
+                    else nv=applyMove5(cur.values,idx,dir,teeth);
+                    const nl = checkUnlock(nv, cur.locked); const key = getKey(nv, nl);
+                    if (parents.has(key)) continue;
+                    parents.set(key, {previous:getKey(cur.values,cur.locked), index:idx, direction:dir});
+                    if (nv.every(v=>v===0)){ finalKey=key; break; }
+                    queue.push({values:nv, locked:nl}); } }
+        }
+        if (!finalKey) return null;
+        const result = []; let key = finalKey;
+        while (parents.get(key)){ const step = parents.get(key); result.push({index:step.index, direction:step.direction}); key = step.previous; }
+        return result.reverse();
+    }
+
+    function showHint() {
+        if (state.solved || state.animating) return;
+        // оплата подсказки: бесплатная от звания → энергия → запас
+        const r = getRank(); const today = new Date().toDateString();
+        if (state.lastFreeHintDay !== today) { state.freeHintsUsedToday = 0; state.lastFreeHintDay = today; }
+        let freeAvailable = r.freeHints - state.freeHintsUsedToday;
+        if (freeAvailable > 0) { 
+            state.freeHintsUsedToday++; 
+        }
+        else if (state.hintStock > 0) {
+            // === НОВОЕ: проверка энергии ===
+            regenEnergy();
+            if (state.energy < CONFIG.ENERGY_PER_HINT) {
+                openEnergyPanel(); 
+                haptic('error'); 
+                return;
+            }
+            state.energy -= CONFIG.ENERGY_PER_HINT;
+            state.hintStock--;
+        } else { 
+            showNotification(t('noHints'), 'error'); 
+            haptic('error'); 
+            return; 
+        }
+
+        const solution = findSolution();
+        if (!solution) { $('info').textContent = '💡 Решение не найдено'; return; }
+        state.levelUsedHint = true;
+        state.hintGroups = []; let currentGroup = null;
+        solution.forEach(step => {
+            if (!currentGroup || currentGroup.index !== step.index || currentGroup.direction !== step.direction) {
+                currentGroup = { index: step.index, direction: step.direction, count: 1 };
+                state.hintGroups.push(currentGroup);
+            } else { currentGroup.count++; }
+        });
+        state.hintGroupIndex = 0; state.hintProgress = 0;
+        state.hintActive = true; state.hintError = false;
+        state.gears.forEach(g => g.hint = false);
+        if (state.hintGroups.length > 0) { state.gears[state.hintGroups[0].index].hint = true; }
+        updateHintDisplay(); updateUI(); tone(520, .08, .03); saveGame(); draw();
+        trackEvent('hint_used', { level: state.level, steps: solution.length, free: freeAvailable > 0 ? 1 : 0 });
+    }
+
+/* --- Обновление отображения подсказки --- */
+    function updateHintDisplay() {
+        if (!state.gears || state.gears.length === 0) return;
+        
+        // Если подсказка не активна или групп нет, очищаем поле информации
+        if (!state.hintActive || state.hintGroups.length === 0) { 
+            $('info').innerHTML = ''; 
+            return; 
+        }
+
+        // 2. Блок формирования заголовка и общей статистики
+        let html = `<div class="solution">`;
+        const totalMoves = state.hintGroups.reduce((sum, g) => sum + g.count, 0);
+        html += `<b>💡 ${t('hint')} (${totalMoves} ${t('moves_plural')})</b>`;
+        
+        // 3. Блок отображения текущего шага и оставшихся ходов
+        html += `<div style="font-size:12px;margin:4px 0;color:#aaa;">`;
+        if (state.hintGroupIndex < state.hintGroups.length) {
+            const totalSteps = state.hintGroups.length;
+            const currentStep = state.hintGroupIndex + 1;
+            const currentGroup = state.hintGroups[state.hintGroupIndex];
+            const remainingMoves = currentGroup.count - state.hintProgress;
+            
+            html += `${t('step')} ${currentStep} ${t('of')} ${totalSteps} | ${t('remaining')}: ${remainingMoves} ${t('moves_plural')}`;
+        } else { 
+            html += `✅ ${t('win')}!`; 
+        }
+        html += `</div>`;
+
+        // 4. Блок детализации по каждой группе шестеренок
+        state.hintGroups.forEach((group, idx) => {
+            const gear = state.gears[group.index];
+            // Определение направления с учетом локализации
+            const directionText = group.direction === 'cw' 
+                ? (state.currentLang === 'ru' ? 'по часовой' : 'clockwise') 
+                : (state.currentLang === 'ru' ? 'против часовой' : 'counter-clockwise');
+            
+            // Определение статуса шага (выполнен, текущий, ошибочный, ожидающий)
+            const isDone = idx < state.hintGroupIndex;
+            const isCurrent = idx === state.hintGroupIndex;
+            const isError = state.hintError && isCurrent;
+            
+            let className = 'step-pending';
+            if (isDone) className = 'step-done';
+            else if (isCurrent && !isError) className = 'step-current';
+            else if (isError) className = 'step-error';
+
+            // Формирование текста прогресса для текущего шага
+            let progressText = '';
+            if (isCurrent && !isError) {
+                progressText = ` (${state.hintProgress}/${group.count})`;
+            } else if (isDone) {
+                progressText = ` ✅`;
+            } else if (isError) {
+                progressText = ` ❌ ${t('wrongGear')}`;
+            }
+
+            html += `<div class="${className}">
+                        ${idx + 1}. <b>${gear.label}</b> — ${directionText} 
+                        ${group.count > 1 ? `×${group.count}` : ''}${progressText}
+                     </div>`;
+        });
+
+        html += `</div>`;
+        
+        // 5. Блок вывода результата в DOM
+        $('info').innerHTML = html;
+    }
+
+ /* --- 5.5. UI обновления --- */
+    function updateUI() {
+        regenEnergy();
+        $('level').textContent = state.level;
+        
+        // === НОВОЕ: отображение лимита ходов ===
+        if (state.moveLimit) {
+            const isOver = state.moves > state.moveLimit;
+            $('moves').innerHTML = `${state.moves} <span style="color:${isOver ? '#ff4444' : '#aaaaca'};font-size:9px;">/ ${state.moveLimit}</span>`;
+        } else {
+            $('moves').textContent = state.moves;
+        }
+        
+        $('score').textContent = state.score;
+        $('total').textContent = state.total;
+        $('energy').textContent = Math.floor(state.energy);
+        $('coinsH').textContent = state.coins;
+        const undoBtn = $('undo');
+        if (state.history.length > 0 && !state.solved){ undoBtn.textContent = `${t('undo')} (${state.history.length})`; undoBtn.disabled = false; }
+        else { undoBtn.textContent = t('undo'); undoBtn.disabled = true; }
+        const hintBtn = $('hint');
+        const r = getRank(); const today = new Date().toDateString();
+        const freeLeft = r.freeHints - (state.lastFreeHintDay===today ? state.freeHintsUsedToday : 0);
+        if (freeLeft > 0 || state.hintStock > 0) {
+            const lbl = freeLeft > 0 ? `${t('hint')} (🎖${freeLeft})` : `${t('hint')} (${state.hintStock})`;
+            hintBtn.textContent = lbl; hintBtn.disabled = false; hintBtn.className = '';
+        } else { hintBtn.textContent = t('noHints'); hintBtn.disabled = true; hintBtn.className = 'empty'; }
+        $('next').disabled = !state.solved;
+        updateInfoText();
+    }
+      /* --- 5.5b. Обновление текста подсказки под полем --- */
+    function updateInfoText() {
+        if (state.solved) return;
+        if (state.hintActive) return;   // если показана подсказка — не затираем её
+        const config = getLevelConfig(state.level);
+        const emoji = config.teethCount===3?'⚙️':config.teethCount===4?'🔧':'🔩';
+        const lockInfo = config.lockCount>0 ? ` 🔒${config.lockCount}` : '';
+        const special = config.isSpecial ? ' 👾' : '';
+        $('info').textContent = state.moves === 0
+            ? `${t('tapGear')} (${state.level} ${emoji}${config.teethCount}${lockInfo}${special})`
+            : `${t('continueCombo')} (${state.gears.length} ${t('gears')})`;
+    }
+    function showNotification(msg, type='info') {
+        const container = document.querySelector('.wrap'); if (!container) return;
+        container.querySelector('.notification')?.remove();
+        const div = document.createElement('div'); div.className = `notification ${type}`; div.textContent = msg;
+        container.appendChild(div); setTimeout(() => div.remove(), window.innerWidth < 768 ? 2500 : 3500);
+    }
+
+    /* --- 5.6. Нативная кнопка Telegram «Далее» --- */
+    function showTelegramNextButton() { if (isTelegram && TG.MainButton){ try { TG.MainButton.setText(t('next')); TG.MainButton.show(); } catch(e){} } }
+    function hideTelegramNextButton() { if (isTelegram && TG.MainButton){ try { TG.MainButton.hide(); } catch(e){} } }
+    if (isTelegram && TG.MainButton) { TG.MainButton.onClick(() => { if (!state.solved) return; goNextLevel(); }); }
+    function goNextLevel() {
+        if (!state.solved) return; stopWinAnimation(); document.querySelector('.win')?.remove();
+        state.solved = false; state.winShown = false; state.animating = false;
+        startLevel(state.level + 1); $('next').disabled = true;
+    }
+
+/* --- 5.7. Победа + удвоение монет за рекламу на боссе --- */
+    function showWin() {
+        if (state.winShown) return; state.winShown = true; state.solved = true;
+        $('next').disabled = false; winSound(); haptic('success'); showTelegramNextButton();
+        
+        // === НОВАЯ СИСТЕМА ЗВЁЗД ===
+        let resultStars;
+        if (state.levelUsedHint) {
+            resultStars = 1;  // подсказка = 1 звезда
+        } else if (state.usedReset || state.moves > state.moveLimit) {
+            resultStars = 2;  // сброс ИЛИ превышение лимита = 2 звезды
+        } else {
+            resultStars = 3;  // всё идеально = 3 звезды
+        }
+        
+        const oldStars = state.bestStars[state.level] || 0;
+        const isFirst = oldStars === 0;
+        // монеты за уровень (с бонусом звания)
+        const r = getRank();
+        let baseCoins = isFirst ? (CONFIG.COIN_REWARD[resultStars] || 5) : 0;
+        baseCoins = Math.round(baseCoins * (1 + r.coinBonus));
+        const config = getLevelConfig(state.level);
+        const bossBonus = (config.isSpecial && isFirst) ? CONFIG.BOSS_BONUS : 0;
+        let totalCoins = baseCoins + bossBonus;
+        // статистика
+        if (isFirst) {
+            state.totalLevelsCompleted++;
+            if (resultStars === 3) state.totalPerfect++;
+            if (!state.levelUsedHint) state.levelsWithoutHint++;
+        }
+        
+        // === НОВАЯ СИСТЕМА ОЧКОВ (100 - ходы в лимите - ходы сверх × 5) ===
+        let movesInLimit = Math.min(state.moves, state.moveLimit);
+        let movesOver = Math.max(0, state.moves - state.moveLimit);
+        let levelScore = Math.max(0, 100 - movesInLimit - (movesOver * 5));
+
+        if (levelScore > (state.bestScores[state.level]||0)) {
+            state.total += levelScore - (state.bestScores[state.level]||0);
+            state.bestScores[state.level] = levelScore;
+        }
+        
+        state.bestStars[state.level] = Math.max(state.bestStars[state.level]||0, resultStars);
+        if (state.level >= state.unlocked) state.unlocked = state.level + 1;
+        // проверка повышения звания (до начисления — чтобы показать переход)
+        const rankBefore = getRank();
+        state.coins += totalCoins;
+        if (totalCoins > 0) coinSound();
+        const rankAfter = getRank();
+        saveGame(); updateProfile();
+        trackEvent('level_complete', { level: state.level, stars: resultStars, moves: state.moves, coins: totalCoins, boss: config.isSpecial?1:0 });
+        checkAchievements();
+        markPlayDay();
+        // окно победы
+        const overlay = document.createElement('div'); overlay.className = 'win';
+        const starsStr = '★'.repeat(resultStars) + '☆'.repeat(3-resultStars);
+        const doubleOffer = (config.isSpecial && isFirst && canShowAd());
+        overlay.innerHTML = `🏆<br><small>${t('levelCompleted',state.level)}${config.isSpecial?' 👾 БОСС!':''}<br>
+            <div class="stars-row" id="starsRow">${starsStr}</div>
+            ${t('score')}: ${levelScore} | ${t('moves')}: ${state.moves}<br>
+            +${totalCoins} 🪙</small>
+            ${doubleOffer ? `<button class="double-btn" id="doubleBtn">📺 Удвоить монеты (+${totalCoins} 🪙)</button>` : ''}`;
+        document.querySelector('.wrap').appendChild(overlay);
+        if (doubleOffer) {
+            $('doubleBtn').onclick = () => {
+                showAd(() => {
+                    state.coins += totalCoins; // удвоение
+                    coinSound(); saveGame(); updateProfile();
+                    showNotification(`+${totalCoins} 🪙 ${t('coinsReward', totalCoins)}`, 'success');
+                    $('doubleBtn').remove();
+                    checkRankUp(rankBefore, rankAfter); // мог повыситься после удвоения
+                    const ra = getRank(); checkRankUp(rankAfter, ra);
+                }, 'boss_double');
+            };
+        }
+        // анимация звёзд
+        setTimeout(() => {
+            const row = overlay.querySelector('.stars-row'); if (!row) return;
+            const text = row.textContent; row.innerHTML = '';
+            for (let i=0;i<text.length;i++){ const span=document.createElement('span'); span.className='star'; span.textContent=text[i];
+                if (text[i]==='★'||text[i]==='☆'){ row.appendChild(span); setTimeout(()=>span.classList.add('show'), i*200+300); }
+                else row.appendChild(document.createTextNode(text[i])); }
+        }, 100);
+        startWinAnimation();
+        // повышение звания (если не было удвоения — проверяем сразу)
+        if (!doubleOffer) checkRankUp(rankBefore, rankAfter);
+        // тултип первой победы
+        showTip('first_win');
+    }
+	    /* ============================================================
+       БЛОК 6. JAVASCRIPT — ЭКОНОМИКА, УДЕРЖАНИЕ, РЕКЛАМА, STARS, ТУЛТИПЫ
+       Реклама-заглушка, Stars, звания, daily, достижения, онбординг, языки
+       ============================================================ */
+
+    /* --- 6.1. Реклама (умные триггеры + заглушка) --- */
+    function canShowAd() {
+        // запрет в первых N уровнях
+        if (state.level <= CONFIG.AD_FREE_LEVELS) return false;
+        // максимум за сессию
+        if (state.adCountSession >= CONFIG.AD_MAX_PER_SESSION) return false;
+        // кулдаун
+        if (Date.now() - state.lastAdTime < CONFIG.AD_COOLDOWN_MS) return false;
+        return true;
+    }
+    function showAd(onReward, reason = 'generic') {
+        trackEvent('ad_requested', { reason: reason, level: state.level });
+        if (!canShowAd()) {
+            // нельзя показать — всё равно даём базовую награду? Нет, просто сообщаем
+            showNotification('⏳ Реклама пока недоступна', 'error');
+            trackEvent('ad_skipped', { reason: 'capped' });
+            return;
+        }
+        // ЗАГЛУШКА: реальной рекламной сети пока нет.
+        // Имитируем показ: начисляем награду сразу. Когда подключим сеть —
+        // здесь будет вызов CONFIG.AD_PROVIDER.show(() => onReward()).
+        state.adCountSession++; state.lastAdTime = Date.now();
+        if (typeof onReward === 'function') onReward();
+        trackEvent('ad_completed', { reason: reason });
+    }
+    function openEnergyPanel() {
+        $('energyPanel').classList.add('open');
+        updateEnergyTimer();
+    }
+    let energyTimerInterval = null;
+    function updateEnergyTimer() {
+        $('energyTimer').textContent = formatTime(timeUntilNextEnergy());
+    }
+	    /* --- Функция обновления панели энергии --- */
+    function updateEnergyInfoPanel() {
+        regenEnergy();
+        const rank = getRank();
+        const current = Math.floor(state.energy);
+        const max = rank.maxEnergy;
+        const regenMs = rank.regenMs;
+        const regenMin = Math.round(regenMs / 60000);
+        
+        $('energyInfoCurrent').textContent = `${current} / ${max}`;
+        $('energyInfoMax').textContent = max;
+        $('energyInfoRegen').textContent = `+10 / ${regenMin} мин`;
+        $('energyInfoTimer').textContent = formatTime(timeUntilNextEnergy());
+        $('energyInfoHintCost').textContent = `${CONFIG.ENERGY_PER_HINT} ⚡`;
+    }
+
+    /* --- 6.2. Telegram Stars (покупка подсказок) --- */
+    function buyWithStars() {
+        trackEvent('stars_purchase_click', { amount: CONFIG.STARS_HINT_AMOUNT });
+        if (!CONFIG.STARS_INVOICE_URL) {
+            showNotification(t('invoiceNotSet'), 'error'); haptic('error'); return;
+        }
+        if (!isTelegram || !TG.openInvoice) {
+            showNotification(t('invoiceNotSet'), 'error'); return;
+        }
+        try {
+            TG.openInvoice(CONFIG.STARS_INVOICE_URL, (status) => {
+                if (status === 'paid') {
+                    state.hintStock += CONFIG.STARS_HINT_AMOUNT;
+                    state.isPayer = true;
+                    saveGame(); updateProfile(); updateUI(); coinSound(); haptic('success');
+                    showNotification(t('starsBought', CONFIG.STARS_HINT_AMOUNT), 'success');
+                }
+            });
+        } catch (e) { showNotification(t('invoiceNotSet'), 'error'); }
+    }
+
+     /* --- 6.3. Покупка подсказок за монеты (со скидкой звания) --- */
+    function hintPrice(base) { return Math.round(base * (1 - getRank().discount)); }
+    function buyHint(count, baseCost) {
+        const cost = hintPrice(baseCost);
+        if (state.coins < cost) { showNotification(t('notEnoughCoins'), 'error'); haptic('error'); return; }
+        state.coins -= cost; state.hintStock += count;
+        saveGame(); updateProfile(); updateUI(); coinSound(); haptic('success');
+        showNotification(count===1 ? t('hintBought') : t('hint3Bought'), 'success');
+        trackEvent('hint_buy_coins', { count: count, cost: cost });
+        checkAchievements();
+    }
+
+    /* --- 6.4. Звания: проверка повышения + окно --- */
+    function checkRankUp(before, after) {
+        if (before.key !== after.key) {
+            trackEvent('rank_up', { from: before.key, to: after.key, coins: state.coins });
+            showRankUpPanel(after);
+            haptic('success');
+        }
+        updateStartRank();
+    }
+    function showRankUpPanel(rank) {
+        $('rankupIcon').textContent = rank.icon;
+        $('rankupName').textContent = rankName(rank);
+        $('rankupPriv').innerHTML = buildPrivList(rank);
+        $('rankupPanel').classList.add('open');
+    }
+      function buildPrivList(rank) {
+        let items = [];
+        items.push(`⚡ ${t('maxEnergy')}: ${rank.maxEnergy}`);
+        items.push(`🔄 ${t('regen')}: +10 / ${Math.round(rank.regenMs/60000)} ${t('min')}`);
+        if (rank.freeHints > 0) items.push(`💡 ${rank.freeHints} ${t('freeHintDay')}`);
+        if (rank.secondChance) items.push(`🛡️ ${t('secondChance')}`);
+        if (rank.coinBonus > 0) items.push(`🪙 +${Math.round(rank.coinBonus*100)}% ${t('coinsBonus')}`);
+        if (rank.discount > 0) items.push(`🏷️ -${Math.round(rank.discount*100)}% ${t('hintPrice')}`);
+        items.push(`🎨 ${t('skin')}: ${rank.skin}`);
+        return items.map(i => `<div style="padding:3px 0;">• ${i}</div>`).join('');
+    }
+    function updateStartRank() {
+        const r = getRank(); const next = getNextRank();
+        $('startRank').textContent = `${r.icon} ${rankName(r)}`;
+        if (next) {
+            const prog = state.coins - r.threshold; const need = next.threshold - r.threshold;
+            $('startRankBar').style.width = Math.min(100, (prog/need)*100) + '%';
+        } else { $('startRankBar').style.width = '100%'; }
+    }
+
+    /* --- 6.5. Ежедневные награды --- */
+    const DAILY_REWARDS = [
+        { icon:'🪙', type:'coins', amount:10 },
+        { icon:'🪙', type:'coins', amount:20 },
+        { icon:'💡', type:'hints', amount:1 },
+        { icon:'🪙', type:'coins', amount:40 },
+        { icon:'⚡', type:'energy', amount:30 },
+        { icon:'💡', type:'hints', amount:2 },
+        { icon:'🎁', type:'coins', amount:100 }
+    ];
+    const L_DAY_ru = 'День ', L_DAY_en = 'Day ';
+    let L_DAY = L_DAY_ru;
+    function renderDailyGrid() {
+        const grid = $('dailyGrid'); grid.innerHTML = '';
+        const today = new Date().toDateString();
+        const claimedToday = state.lastDailyClaim === today;
+        L_DAY = state.currentLang === 'en' ? L_DAY_en : L_DAY_ru;
+        for (let i=0;i<7;i++){
+            const cell = document.createElement('div');
+            cell.className = 'daily-cell';
+            if (i < state.dailyStreak) cell.classList.add('claimed');
+            const isToday = (i === state.dailyStreak) && !claimedToday;
+            if (isToday) cell.classList.add('today');
+            const rew = DAILY_REWARDS[i % 7];
+            cell.innerHTML = `<div class="dnum">${L_DAY}${i+1}</div><div class="drew">${rew.icon}</div><div>${rew.amount}</div>`;
+            grid.appendChild(cell);
+        }
+        const canClaim = !claimedToday;
+        $('claimDaily').disabled = !canClaim;
+        $('claimDaily').textContent = canClaim ? t('claimDaily') : t('alreadyClaimed');
+    }
+    function claimDailyReward() {
+        const today = new Date().toDateString();
+        if (state.lastDailyClaim === today) return;
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+        if (state.lastDailyClaim && state.lastDailyClaim !== yesterday && state.lastDailyClaim !== today) {
+            state.dailyStreak = 0;
+        }
+        const idx = state.dailyStreak % 7;
+        const rew = DAILY_REWARDS[idx];
+        if (rew.type === 'coins') state.coins += rew.amount;
+        else if (rew.type === 'hints') state.hintStock += rew.amount;
+        else if (rew.type === 'energy') addEnergy(rew.amount);
+        state.dailyStreak++; state.lastDailyClaim = today;
+        saveGame(); updateProfile(); updateUI(); coinSound(); haptic('success');
+        showNotification(`🎁 +${rew.amount} ${rew.icon}`, 'success');
+        trackEvent('daily_claimed', { day: state.dailyStreak, type: rew.type, amount: rew.amount });
+        renderDailyGrid(); checkAchievements();
+        showTip('first_daily');
+    }
+
+    /* --- 6.6. Достижения --- */
+    const ACHIEVEMENTS = [
+        { key:'first_step',   icon:'👣', ru:'Первые шаги',     en:'First steps',      check: s => s.totalLevelsCompleted >= 1,   rew:{coins:10} },
+        { key:'ten_levels',   icon:'🔟', ru:'Десяточка',       en:'Ten levels',       check: s => s.totalLevelsCompleted >= 10,  rew:{coins:30} },
+        { key:'perfect_10',   icon:'⭐', ru:'Перфекционист',   en:'Perfectionist',    check: s => s.totalPerfect >= 10,          rew:{hints:2} },
+        { key:'no_hint_5',    icon:'🧠', ru:'Сам умный',       en:'Self-made',        check: s => s.levelsWithoutHint >= 5,      rew:{coins:40} },
+        { key:'locks_20',     icon:'🔓', ru:'Взломщик замков', en:'Lockpicker',       check: s => s.totalLocksOpened >= 20,      rew:{coins:50} },
+        { key:'collector',    icon:'💰', ru:'Коллекционер',    en:'Collector',        check: s => s.coins >= 500,                rew:{hints:3} },
+              { key:'marathon',     icon:'🔥', ru:'Марафонец',       en:'Marathon',         check: s => Object.keys(s.playDays||{}).length >= 7, rew:{coins:100} },
+        { key:'master_rank',  icon:'🔧', ru:'Мастер механизма',en:'Gear Master',      check: s => s.coins >= 600,                rew:{energy:50} }
+    ];
+    function checkAchievements() {
+        ACHIEVEMENTS.forEach(a => {
+            if (!state.achievements[a.key] && a.check(state)) {
+                state.achievements[a.key] = true;
+                if (a.rew.coins) state.coins += a.rew.coins;
+                if (a.rew.hints) state.hintStock += a.rew.hints;
+                if (a.rew.energy) addEnergy(a.rew.energy);
+                showNotification(`🏆 ${state.currentLang==='en'?a.en:a.ru}!`, 'success');
+                tone(700,0.1,0.04); haptic('success');
+                trackEvent('achievement_unlocked', { key: a.key });
+                saveGame();
+            }
+        });
+        updateProfile(); updateUI();
+    }
+    function renderAchievements() {
+        const list = $('achieveList'); list.innerHTML = '';
+        ACHIEVEMENTS.forEach(a => {
+            const done = !!state.achievements[a.key];
+            const div = document.createElement('div');
+            div.className = 'achieve-item' + (done ? ' done' : '');
+            const rewText = Object.entries(a.rew).map(([k,v]) => `+${v} ${k==='coins'?'🪙':k==='hints'?'💡':'⚡'}`).join(' ');
+            div.innerHTML = `<span>${a.icon} ${state.currentLang==='en'?a.en:a.ru} ${done?'✅':''}</span><span class="rew">${rewText}</span>`;
+            list.appendChild(div);
+        });
+    }
+
+    /* --- 6.7. Учёт игровых дней --- */
+    function markPlayDay() {
+        const today = new Date().toDateString();
+        if (!state.playDays) state.playDays = {};
+        state.playDays[today] = true;
+    }
+
+    /* --- 6.8. Умные тултипы (онбординг, один раз) --- */
+    const TIPS = {
+        first_launch:  { ru:'👋 Добро пожаловать! Крути шестерни, чтобы все числа стали зелёными ✓.', en:'👋 Welcome! Turn the gears until all numbers turn green ✓.' },
+        first_win:     { ru:'🏆 Уровень пройден! Ты получил монеты 🪙 — копи их ради званий и привилегий.', en:'🏆 Level complete! You got coins 🪙 — save them for ranks and perks.' },
+        energy_low:    { ru:'⚡ Это энергия. Она тратится на подсказки и восстанавливается со временем или за рекламу.', en:'⚡ This is energy. Hints spend it; it regenerates over time or via ads.' },
+        first_hint:    { ru:'💡 Подсказка показывает полное решение и тратит 10 энергии.', en:'💡 A hint shows the full solution and costs 10 energy.' },
+        first_coins:   { ru:'🪙 Монеты копятся ради званий. Чем выше звание — тем больше привилегий!', en:'🪙 Coins build your rank. Higher rank = more perks!' },
+        first_boss:    { ru:'👾 Это босс-уровень! За него можно удвоить монеты через рекламу.', en:'👾 Boss level! You can double coins here via an ad.' },
+        first_shop:    { ru:'🛒 Здесь подсказки за монеты или Stars. У твоего звания есть скидка!', en:'🛒 Hints for coins or Stars. Your rank gives a discount!' },
+        first_daily:   { ru:'🎁 Отлично! Заходи каждый день — награды растут.', en:'🎁 Great! Come daily — rewards grow.' }
+    };
+    function showTip(key) {
+        if (state.shownTips[key]) return;
+        if (!TIPS[key]) return;
+        state.shownTips[key] = true; saveGame();
+        const txt = state.currentLang === 'en' ? TIPS[key].en : TIPS[key].ru;
+        $('tipText').textContent = txt;
+        $('tipLayer').classList.add('open');
+        clearTimeout(window._tipAutoHide);
+        window._tipAutoHide = setTimeout(() => $('tipLayer').classList.remove('open'), 9000);
+    }
+    function maybeShowEnergyTip() { if (state.energy < 50 && state.energy >= 40) showTip('energy_low'); }
+    function maybeShowCoinsTip() { if (state.coins >= 100 && state.coins < 130) showTip('first_coins'); }
+/* --- 6.9. Локализация (словари языков) --- */
+    const LANG = {
+        ru: {
+            // === ОСНОВНЫЕ ===
+            title:'GEAR PUZZLE',
+            subtitle:'СОБЕРИ МЕХАНИЗМ',
+            play:'ИГРАТЬ',
+            settings:'НАСТРОЙКИ',
+            tutorial:'КАК ИГРАТЬ',
+            version:'ВЕРСИЯ 3.0',
+            level:'Уровень',
+            moves:'Ходы',
+            score:'Очки',
+            total:'Всего',
+            hint:'Подсказка',
+            undo:'Отмена',
+            reset:'Сброс',
+            next:'Следующий',
+            tapGear:'👆 Нажми на шестерёнку',
+            continueCombo:'Продолжай комбинацию',
+            noHints:'💡 Нет подсказок',
+            notEnoughCoins:'❌ Недостаточно монет!',
+            hintBought:'💡 Куплена 1 подсказка!',
+            hint3Bought:'💡 Куплено 3 подсказки!',
+            starsBought:'⭐ Спасибо! +%s подсказок',
+            invoiceNotSet:'⚙️ Покупка за Stars скоро будет доступна!',
+            levelCompleted:'Уровень %s пройден!',
+            coinsReward:'+%s 🪙',
+            gearUnlocked:'🔓 Шестерёнка %s разблокирована!',
+            gearLocked:'🔒 Шестерёнка заблокирована!',
+            gears:'шестерёнки',
+            moves_plural:'ходов',
+            claimDaily:'Забрать награду дня',
+            alreadyClaimed:'Уже забрано сегодня',
+            hintCW:'ПКМ / Правая — по часовой',
+            hintCCW:'ЛКМ / Левая — против',
+            wrongGear:'Не та шестеренка!',
+            step:'Шаг',
+            of:'из',
+            remaining:'Осталось',
+            win:'Победа',
+            
+            // === ПРИВИЛЕГИИ ЗВАНИЯ ===
+            maxEnergy:'Макс. энергия',
+            regen:'Реген',
+            min:'мин',
+            freeHintDay:'беспл. подсказка/день',
+            secondChance:'Второй шанс 1/день',
+            coinsBonus:'монет',
+            hintPrice:'цена подсказки',
+            skin:'Скин',
+            
+            // === МАГАЗИН ===
+            shop:'🛒 Магазин',
+            coinsLabel:'Монет:',
+            oneHint:'1 подсказка',
+            threeHints:'3 подсказки',
+            inStock:'Подсказок:',
+            maxRank:'МАКС',
+            
+            // === МЕНЮ ===
+            menuTitle:'⚙️ Меню',
+            playerLabel:'Игрок:',
+            rankLabel:'Звание:',
+            toNextRank:'До след. звания:',
+            scoreLabelM:'Очки:',
+            completedLabel:'Пройдено:',
+            coinsLabelM:'Монет:',
+            soundLabel:'Звук:',
+            langLabel:'Язык:',
+            privTitle:'🎖️ Привилегии звания',
+            shareTitle:'📤 Поделиться',
+            levelsTitle:'📜 Уровни',
+            shareBtn:'📤 Поделиться игрой',
+            clearProgress:'🗑️ Сбросить прогресс',
+            dailyBonus:'🎁 Ежедневный бонус',
+            achievements:'🏆 Достижения',
+            buyStars:'⭐ Купить за Telegram Stars',
+            energyBtn:'⚡ Энергия',
+            
+            // === ЗВАНИЯ (панель) ===
+            ranksButton:'🏅 Звания',
+            ranksTitle:'🏅 Все звания',
+            ranksSubtitle:'Копи монеты — получай новые звания и привилегии!',
+            ranksTableHeadRank:'🏅 Звание',
+            ranksTableHeadCoins:'🪙 Монет',
+            ranksTableHeadEnergy:'⚡ Энергия',
+            ranksTableHeadPriv:'💡 Привилегии',
+            ranksTableHeadStatus:'Статус',
+            ranksStatusLocked:'🔒',
+            ranksStatusUnlocked:'✅ Достигнуто',
+            ranksStatusNext:'⏳ Следующее',
+            ranksStatusStart:'Старт',
+            ranksPrivFreeHints:'беспл. подсказок',
+            ranksPrivSecondChance:'🛡️ 2-й шанс',
+            ranksPrivCoinBonus:'% монет',
+            ranksPrivDiscount:'% цена',
+            ranksOk:'Понятно',
+            
+            // === СПРАВКА (НОВАЯ) ===
+            helpTitle:'❓ КАК ИГРАТЬ',
+            helpGoal:'🎯 Цель — поворачивать шестерни так, чтобы все числа стали зелёными галочками ✅.',
+            helpPCLabel:'🖥️ На ПК:',
+            helpPC1:'Правый клик (ПКМ) — по часовой стрелке.',
+            helpPC2:'Левый клик (ЛКМ) — против часовой стрелки.',
+            helpMobileLabel:'📱 На смартфоне:',
+            helpMobile1:'Клик по правой половине шестерни — по часовой стрелке.',
+            helpMobile2:'Клик по левой половине шестерни — против часовой стрелки.',
+            helpStars:'⭐ Звёзды:',
+            helpStars1:'3 звезды — без подсказки, без сброса, ходы ≤ лимиту.',
+            helpStars2:'2 звезды — без подсказки, но был сброс ИЛИ превышен лимит ходов.',
+            helpStars3:'1 звезда — использована подсказка.',
+            helpLimit:'📊 Лимит ходов:',
+            helpLimit1:'3 шестерни = 10 ходов',
+            helpLimit2:'4 шестерни = 20 ходов',
+            helpLimit3:'5 шестерён = 30 ходов',
+            helpLimit4:'Если превысить лимит — каждый следующий ход стоит 1 ⚡ энергии.',
+            helpEnergy:'⚡ Энергия:',
+            helpEnergy1:'На что тратится: подсказка (20 ⚡), сброс (5 ⚡), ход сверх лимита (1 ⚡).',
+            helpEnergy2:'Как восполнить: авто-регенерация (+10 ⚡), реклама (+20 ⚡), покупка за монеты или Stars.',
+            helpEnergy3:'Если энергия на нуле — можно делать только ходы в пределах лимита.',
+            helpEnergy4:'Чтобы пополнить энергию — открой меню (⚙️) и нажми "Энергия".',
+            helpScore:'⭐ Очки:',
+            helpScore1:'Старт: 100 очков.',
+            helpScore2:'Минус 1 очко за каждый ход в пределах лимита.',
+            helpScore3:'Минус 5 очков за каждый ход сверх лимита.',
+            helpScore4:'Пример: лимит 10, прошёл за 12 ходов → 100 − 10 − (2×5) = 80 очков.',
+            helpScore5:'Очки копятся в общий рейтинг игрока.',
+            helpCoins:'🪙 Монеты:',
+            helpCoins1:'Как заработать: за первое прохождение уровня — 5/10/30 🪙 (за 1/2/3 звезды).',
+            helpCoins2:'За босс-уровни (5, 10, 15...) — дополнительный бонус.',
+            helpCoins3:'Повторное прохождение монеты не даёт.',
+            helpCoins4:'На что тратить: подсказки (1=30🪙, 3=80🪙) и энергия (20=25🪙, 50=50🪙, 100=80🪙).',
+            helpRanks:'🏅 Звания:',
+            helpRanks1:'Открываются при накоплении определённого количества монет.',
+            helpRanks2:'Дают привилегии: больше энергии, быстрее регенерация, скидки, бесплатные подсказки.',
+            helpLocks:'🔒 Замки:',
+            helpLocks1:'Чтобы снять замок — обнули соседние шестерни.',
+            helpLocks2:'Для 3 шестерён достаточно обнулить одну соседнюю.',
+            helpLocks3:'Для 4–5 шестерён нужно обнулить обе соседние.',
+            helpAd:'📺 Реклама:',
+            helpAd1:'На боссах (5, 10, 15...) — обязательная, даёт удвоение монет.',
+            helpAd2:'В панели "Энергия" — добровольная, даёт +20 ⚡.',
+            helpAd3:'Когда энергия на нуле — добровольная, даёт +20 ⚡.',
+            helpHint:'💡 Подсказка:',
+            helpHint1:'Показывает полный алгоритм решения уровня.',
+            helpHint2:'Стоит 20 ⚡ (или бесплатная, если есть от звания).',
+            helpHint3:'Использование подсказки даёт 1 звезду.',
+            helpDaily:'🎁 Ежедневные награды:',
+            helpDaily1:'Заходи каждый день — получай растущие бонусы.',
+            helpDaily2:'Пропустил день — серия сбросится.',
+            helpAchieve:'🏆 Достижения:',
+            helpAchieve1:'Выполняй цели — получай награды (монеты, подсказки, энергия).',
+            helpShare:'📤 Поделиться:',
+            helpShare1:'Поделись игрой с друзьями — зови их в рейтинг!'
+        },
+        en: {
+            // === MAIN ===
+            title:'GEAR PUZZLE',
+            subtitle:'ASSEMBLE THE MECHANISM',
+            play:'PLAY',
+            settings:'SETTINGS',
+            tutorial:'HOW TO PLAY',
+            version:'VERSION 3.0',
+            level:'Level',
+            moves:'Moves',
+            score:'Score',
+            total:'Total',
+            hint:'Hint',
+            undo:'Undo',
+            reset:'Reset',
+            next:'Next',
+            tapGear:'👆 Tap on the gear',
+            continueCombo:'Continue the combination',
+            noHints:'💡 No hints',
+            notEnoughCoins:'❌ Not enough coins!',
+            hintBought:'💡 1 hint bought!',
+            hint3Bought:'💡 3 hints bought!',
+            starsBought:'⭐ Thanks! +%s hints',
+            invoiceNotSet:'⚙️ Stars purchase coming soon!',
+            levelCompleted:'Level %s completed!',
+            coinsReward:'+%s 🪙',
+            gearUnlocked:'🔓 Gear %s unlocked!',
+            gearLocked:'🔒 Gear is locked!',
+            gears:'gears',
+            moves_plural:'moves',
+            claimDaily:'Claim daily reward',
+            alreadyClaimed:'Already claimed today',
+            hintCW:'RMB / Right — clockwise',
+            hintCCW:'LMB / Left — counter',
+            wrongGear:'Wrong gear!',
+            step:'Step',
+            of:'of',
+            remaining:'Remaining',
+            win:'Win',
+            
+            // === RANK PRIVILEGES ===
+            maxEnergy:'Max energy',
+            regen:'Regen',
+            min:'min',
+            freeHintDay:'free hint(s)/day',
+            secondChance:'Second chance 1/day',
+            coinsBonus:'coins',
+            hintPrice:'hint price',
+            skin:'Skin',
+            
+            // === SHOP ===
+            shop:'🛒 Shop',
+            coinsLabel:'Coins:',
+            oneHint:'1 hint',
+            threeHints:'3 hints',
+            inStock:'Hints:',
+            maxRank:'MAX',
+            
+            // === MENU ===
+            menuTitle:'⚙️ Menu',
+            playerLabel:'Player:',
+            rankLabel:'Rank:',
+            toNextRank:'To next rank:',
+            scoreLabelM:'Score:',
+            completedLabel:'Completed:',
+            coinsLabelM:'Coins:',
+            soundLabel:'Sound:',
+            langLabel:'Language:',
+            privTitle:'🎖️ Rank Privileges',
+            shareTitle:'📤 Share',
+            levelsTitle:'📜 Levels',
+            shareBtn:'📤 Share game',
+            clearProgress:'🗑️ Reset progress',
+            dailyBonus:'🎁 Daily bonus',
+            achievements:'🏆 Achievements',
+            buyStars:'⭐ Buy with Telegram Stars',
+            energyBtn:'⚡ Energy',
+            
+            // === RANKS (panel) ===
+            ranksButton:'🏅 Ranks',
+            ranksTitle:'🏅 All Ranks',
+            ranksSubtitle:'Collect coins — unlock new ranks and privileges!',
+            ranksTableHeadRank:'🏅 Rank',
+            ranksTableHeadCoins:'🪙 Coins',
+            ranksTableHeadEnergy:'⚡ Energy',
+            ranksTableHeadPriv:'💡 Privileges',
+            ranksTableHeadStatus:'Status',
+            ranksStatusLocked:'🔒',
+            ranksStatusUnlocked:'✅ Achieved',
+            ranksStatusNext:'⏳ Next',
+            ranksStatusStart:'Start',
+            ranksPrivFreeHints:'free hints',
+            ranksPrivSecondChance:'🛡️ 2nd chance',
+            ranksPrivCoinBonus:'% coins',
+            ranksPrivDiscount:'% price',
+            ranksOk:'Got it',
+            
+            // === HELP (NEW) ===
+            helpTitle:'❓ HOW TO PLAY',
+            helpGoal:'🎯 Goal — turn the gears so all numbers become green checkmarks ✅.',
+            helpPCLabel:'🖥️ On PC:',
+            helpPC1:'Right click (RMB) — clockwise.',
+            helpPC2:'Left click (LMB) — counter-clockwise.',
+            helpMobileLabel:'📱 On smartphone:',
+            helpMobile1:'Click on the right half of the gear — clockwise.',
+            helpMobile2:'Click on the left half of the gear — counter-clockwise.',
+            helpStars:'⭐ Stars:',
+            helpStars1:'3 stars — no hints, no reset, moves ≤ limit.',
+            helpStars2:'2 stars — no hints, but reset OR moves over limit.',
+            helpStars3:'1 star — hint used.',
+            helpLimit:'📊 Move limit:',
+            helpLimit1:'3 gears = 10 moves',
+            helpLimit2:'4 gears = 20 moves',
+            helpLimit3:'5 gears = 30 moves',
+            helpLimit4:'If you exceed the limit — each next move costs 1 ⚡ energy.',
+            helpEnergy:'⚡ Energy:',
+            helpEnergy1:'Spent on: hint (20 ⚡), reset (5 ⚡), move over limit (1 ⚡).',
+            helpEnergy2:'How to restore: auto-regen (+10 ⚡), ads (+20 ⚡), purchase for coins or Stars.',
+            helpEnergy3:'If energy is zero — you can only make moves within the limit.',
+            helpEnergy4:'To restore energy — open menu (⚙️) and click "Energy".',
+            helpScore:'⭐ Score:',
+            helpScore1:'Start: 100 points.',
+            helpScore2:'Minus 1 point for each move within the limit.',
+            helpScore3:'Minus 5 points for each move over the limit.',
+            helpScore4:'Example: limit 10, completed in 12 moves → 100 − 10 − (2×5) = 80 points.',
+            helpScore5:'Points accumulate in the overall player ranking.',
+            helpCoins:'🪙 Coins:',
+            helpCoins1:'How to earn: for first completion — 5/10/30 🪙 (for 1/2/3 stars).',
+            helpCoins2:'Boss levels (5, 10, 15...) — bonus reward.',
+            helpCoins3:'Replaying a level does NOT give coins again.',
+            helpCoins4:'What to spend on: hints (1=30🪙, 3=80🪙) and energy (20=25🪙, 50=50🪙, 100=80🪙).',
+            helpRanks:'🏅 Ranks:',
+            helpRanks1:'Unlocked by accumulating a certain number of coins.',
+            helpRanks2:'Give privileges: more energy, faster regen, discounts, free hints.',
+            helpLocks:'🔒 Locks:',
+            helpLocks1:'To unlock — zero out neighboring gears.',
+            helpLocks2:'For 3 gears, it\'s enough to zero out one neighbor.',
+            helpLocks3:'For 4–5 gears, you need to zero out both neighbors.',
+            helpAd:'📺 Ads:',
+            helpAd1:'On bosses (5, 10, 15...) — mandatory, gives double coins.',
+            helpAd2:'In the "Energy" panel — voluntary, gives +20 ⚡.',
+            helpAd3:'When energy is zero — voluntary, gives +20 ⚡.',
+            helpHint:'💡 Hint:',
+            helpHint1:'Shows the full solution algorithm.',
+            helpHint2:'Costs 20 ⚡ (or free if you have it from your rank).',
+            helpHint3:'Using a hint gives 1 star.',
+            helpDaily:'🎁 Daily rewards:',
+            helpDaily1:'Check in every day — get growing bonuses.',
+            helpDaily2:'Miss a day — the streak resets.',
+            helpAchieve:'🏆 Achievements:',
+            helpAchieve1:'Complete goals — get rewards (coins, hints, energy).',
+            helpShare:'📤 Share:',
+            helpShare1:'Share the game with friends — invite them to the ranking!'
+        }
+    };
+    function t(key, ...args){ let text = LANG[state.currentLang]?.[key] || LANG.ru[key] || key; if(args.length) text = text.replace(/%s/g, ()=>args.shift()); return text; }
+	    /* ============================================================
+       БЛОК 7. JAVASCRIPT — ИНИЦИАЛИЗАЦИЯ
+       updateProfile, язык, обработчики кнопок, запуск, читы
+       ============================================================ */
+    /* --- 7.1. Обновление профиля и магазина --- */
+    function updateProfile() {
+        const r = getRank(); const next = getNextRank();
+        $('profileName').textContent = state.playerName;
+        $('profileRank').textContent = `${r.icon} ${rankName(r)}`;
+        if (next) {
+            $('profileRankProg').textContent = `${state.coins} / ${next.threshold} 🪙`;
+        } else { $('profileRankProg').textContent = t('maxRank'); }
+        $('profileTotalScore').textContent = state.total;
+        $('profileCompleted').textContent = `${state.totalLevelsCompleted} / 40`;
+        $('profileCoins').textContent = `${state.coins} 🪙`;
+        $('shopCoins').textContent = `${state.coins} 🪙`;
+        $('hintStockDisplay').textContent = state.hintStock;
+		        renderLevels();
+        // цены со скидкой звания + перевод текста кнопок
+        const p1 = hintPrice(CONFIG.HINT_PRICE_1);
+        const p3 = hintPrice(CONFIG.HINT_PRICE_3);
+        $('shopHint1').innerHTML = `💡 ${t('oneHint')} (<span id="price1">${p1}</span> 🪙)`;
+        $('shopHint3').innerHTML = `💡 ${t('threeHints')} (<span id="price3">${p3}</span> 🪙)`;
+        // привилегии текущего звания в меню
+        $('privList').innerHTML = buildPrivList(r);
+        $('soundToggle').checked = state.soundEnabled;
+        $('langSelect').value = state.currentLang;
+        updateStartRank();
+    }
+
+/* --- 7.2. Применение языка ко всем элементам --- */
+function applyLanguage() {
+    const L = state.currentLang;
+    $('startTitle').textContent = LANG[L].title;
+    $('startSubtitle').textContent = LANG[L].subtitle;
+    $('playText').textContent = LANG[L].play;
+    $('settingsText').textContent = LANG[L].settings;
+    $('tutorialText').textContent = LANG[L].tutorial;
+    $('startVersion').textContent = LANG[L].version;
+    $('levelLabel').textContent = LANG[L].level;
+    $('hintCW').textContent = LANG[L].hintCW;
+    $('hintCCW').textContent = LANG[L].hintCCW;
+    $('undo').textContent = LANG[L].undo;
+    $('reset').textContent = LANG[L].reset;
+    $('next').textContent = LANG[L].next;
+    // Меню
+    $('menuTitle').textContent = t('menuTitle');
+    $('playerLabel').textContent = t('playerLabel');
+    $('rankLabel').textContent = t('rankLabel');
+    $('scoreLabelM').textContent = t('scoreLabelM');
+    $('completedLabel').textContent = t('completedLabel');
+    $('coinsLabelM').textContent = t('coinsLabelM');
+    $('soundLabel').textContent = t('soundLabel');
+    $('langLabel').textContent = t('langLabel');
+    $('toNextRankLabel').textContent = t('toNextRank');
+    $('privTitle').textContent = t('privTitle');
+    $('shopTitle').textContent = t('shop');
+    $('shopCoinsLabel').textContent = t('coinsLabel');
+    $('inStockLabel').textContent = t('inStock');
+    $('shareTitle').textContent = t('shareTitle');
+    $('shareBtn').textContent = t('shareBtn');
+    $('levelsTitle').textContent = t('levelsTitle');
+    $('clearProgress').textContent = t('clearProgress');
+    $('openDaily').textContent = t('dailyBonus');
+    $('openAchieve').textContent = t('achievements');
+    $('shopStars').textContent = t('buyStars');
+    $('openRanks').textContent = t('ranksButton');
+    $('openEnergyInfo').textContent = t('energyBtn');  // <--- НОВАЯ СТРОКА
+    $('ranksTitle').textContent = t('ranksTitle');
+    $('ranksSubtitle').textContent = t('ranksSubtitle');
+    $('ranksOk').textContent = t('ranksOk');
+    
+    // Обновление панели "Как играть" (НОВАЯ ВЕРСИЯ)
+    $('helpTitle').textContent = t('helpTitle');
+    $('helpGoal').textContent = t('helpGoal');
+    $('helpPCLabel').textContent = t('helpPCLabel');
+    $('helpPC1').textContent = t('helpPC1');
+    $('helpPC2').textContent = t('helpPC2');
+    $('helpMobileLabel').textContent = t('helpMobileLabel');
+    $('helpMobile1').textContent = t('helpMobile1');
+    $('helpMobile2').textContent = t('helpMobile2');
+    
+    // Обновление разделов помощи (НОВАЯ ВЕРСИЯ)
+    const sections = document.querySelectorAll('.help-section');
+    if (sections.length >= 14) {
+        const helpData = [
+            { label: 'helpPCLabel', items: ['helpPC1', 'helpPC2'] },
+            { label: 'helpMobileLabel', items: ['helpMobile1', 'helpMobile2'] },
+            { label: 'helpStars', items: ['helpStars1', 'helpStars2', 'helpStars3'] },
+            { label: 'helpLimit', items: ['helpLimit1', 'helpLimit2', 'helpLimit3', 'helpLimit4'] },
+            { label: 'helpEnergy', items: ['helpEnergy1', 'helpEnergy2', 'helpEnergy3', 'helpEnergy4'] },
+            { label: 'helpScore', items: ['helpScore1', 'helpScore2', 'helpScore3', 'helpScore4', 'helpScore5'] },
+            { label: 'helpCoins', items: ['helpCoins1', 'helpCoins2', 'helpCoins3', 'helpCoins4'] },
+            { label: 'helpRanks', items: ['helpRanks1', 'helpRanks2'] },
+            { label: 'helpLocks', items: ['helpLocks1', 'helpLocks2', 'helpLocks3'] },
+            { label: 'helpAd', items: ['helpAd1', 'helpAd2', 'helpAd3'] },
+            { label: 'helpHint', items: ['helpHint1', 'helpHint2', 'helpHint3'] },
+            { label: 'helpDaily', items: ['helpDaily1', 'helpDaily2'] },
+            { label: 'helpAchieve', items: ['helpAchieve1'] },
+            { label: 'helpShare', items: ['helpShare1'] }
+        ];
+        
+        sections.forEach((section, idx) => {
+            if (idx < helpData.length) {
+                const data = helpData[idx];
+                const labelEl = section.querySelector('.label');
+                if (labelEl) labelEl.textContent = t(data.label);
+                const items = section.querySelectorAll('li');
+                items.forEach((li, liIdx) => {
+                    if (liIdx < data.items.length) {
+                        li.textContent = t(data.items[liIdx]);
+                    }
+                });
+            }
+        });
+    }
+    
+    L_DAY = L === 'en' ? L_DAY_en : L_DAY_ru;
+  
+    // подсветка кнопок языка
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === L));
+       updateInfoText(); updateUI(); updateProfile(); renderDailyGrid(); renderAchievements(); renderLevels();
+}
+function setLanguage(lang) {
+    state.currentLang = lang; saveGame(); applyLanguage(); updateProfile();
+}
+/* --- 7.3. Рендер сетки уровней в меню --- */
+    function renderLevels() {
+        const c = $('levelsContainer'); c.innerHTML = '';
+        for (let i=1;i<=40;i++){
+            const btn = document.createElement('button');
+            const cfg = getLevelConfig(i);
+            const stars = state.bestStars[i] || 0;
+            const completed = stars > 0;
+            const locked = i > state.unlocked;
+            btn.className = (completed?'completed ':'') + (locked?'locked ':'') + (cfg.isSpecial?'boss ':'') + (i===state.level?'current':'');
+            if (completed) btn.classList.add('stars-'+stars);
+            btn.textContent = locked ? '🔒' : i;
+            btn.disabled = locked;
+            btn.onclick = () => { if (!locked) { $('panel').classList.remove('open'); startLevel(i); } };
+            c.appendChild(btn);
+        }
+    }
+/* --- 7.4. Обработчики кнопок --- */
+    // Старт
+    $('startPlayBtn').onclick = () => { haptic('light'); $('startScreen').classList.add('hidden'); $('game').classList.add('active'); setupCanvas(); startLevel(state.level); showTip('first_launch'); };
+    $('startSettingsBtn').onclick = () => { haptic('light'); updateProfile(); renderLevels(); $('panel').classList.add('open'); };
+    $('startTutorialBtn').onclick = () => { haptic('light'); $('helpPanel').classList.add('open'); };
+    // Язык на старте
+    document.querySelectorAll('.lang-btn').forEach(b => b.onclick = () => setLanguage(b.dataset.lang));
+    // Меню
+    $('menuBtn').onclick = () => { haptic('light'); updateProfile(); renderLevels(); $('panel').classList.add('open'); };
+    $('helpBtn').onclick = () => { haptic('light'); $('helpPanel').classList.add('open'); };
+    $('closePanel').onclick = () => $('panel').classList.remove('open');
+    $('closeHelp').onclick = () => $('helpPanel').classList.remove('open');
+    // Звук и язык в меню
+    $('soundToggle').onchange = (e) => { state.soundEnabled = e.target.checked; saveGame(); };
+    $('langSelect').onchange = (e) => setLanguage(e.target.value);
+    // Кнопки игры
+    $('undo').onclick = () => { if (state.history.length && !state.solved) restoreState(state.history.pop()); };
+    
+    // === НОВОЕ: ОБРАБОТЧИК КНОПКИ RESET С ТРАТОЙ ЭНЕРГИИ ===
+    $('reset').onclick = () => { 
+        haptic('medium'); 
+        regenEnergy();
+        if (state.energy < CONFIG.ENERGY_PER_RESET) {
+            showNotification('⚡ Недостаточно энергии для сброса!', 'error');
+            haptic('error');
+            return;
+        }
+        state.energy -= CONFIG.ENERGY_PER_RESET;
+        state.usedReset = true; 
+        startLevel(state.level); 
+    };
+    
+    $('hint').onclick = () => { showTip('first_hint'); showHint(); };
+    $('next').onclick = goNextLevel;
+    // Магазин
+    $('shopHint1').onclick = () => { showTip('first_shop'); buyHint(1, CONFIG.HINT_PRICE_1); };
+    $('shopHint3').onclick = () => { showTip('first_shop'); buyHint(3, CONFIG.HINT_PRICE_3); };
+    $('shopStars').onclick = buyWithStars;
+    // Поделиться
+    $('shareBtn').onclick = () => {
+        const url = location.href.split('?')[0];
+        const text = state.currentLang === 'en' ? '🔧 Gear Puzzle — assemble the mechanism!' : '🔧 Gear Puzzle — собери механизм!';
+        if (!tgShare(text, url)) {
+            try { navigator.clipboard.writeText(url); showNotification('📋 Ссылка скопирована!', 'success'); } catch(e) {}
+        }
+        trackEvent('share_click', { level: state.level });
+    };
+    // Ежедневный бонус
+    $('openDaily').onclick = () => { renderDailyGrid(); $('dailyPanel').classList.add('open'); };
+    $('closeDaily').onclick = () => $('dailyPanel').classList.remove('open');
+    $('claimDaily').onclick = claimDailyReward;
+    // Достижения
+    $('openAchieve').onclick = () => { renderAchievements(); $('achievePanel').classList.add('open'); };
+    $('closeAchieve').onclick = () => $('achievePanel').classList.remove('open');
+    // Звания
+    $('openRanks').onclick = () => { 
+        haptic('light'); 
+        renderRanksTable(); 
+        $('ranksPanel').classList.add('open'); 
+    };
+    $('closeRanks').onclick = () => $('ranksPanel').classList.remove('open');
+    $('ranksOk').onclick = () => $('ranksPanel').classList.remove('open');
+
+    // Энергия (информационная панель)
+    $('openEnergyInfo').onclick = () => {
+        haptic('light');
+        updateEnergyInfoPanel();
+        $('energyInfoPanel').classList.add('open');
+    };
+    $('closeEnergyInfo').onclick = () => $('energyInfoPanel').classList.remove('open');
+    $('energyInfoClose').onclick = () => $('energyInfoPanel').classList.remove('open');
+    
+    // Кнопка "Смотреть рекламу" в панели энергии
+    $('energyInfoAd').onclick = () => {
+        showAd(() => {
+            addEnergy(CONFIG.AD_ENERGY_BONUS);
+            updateEnergyInfoPanel();
+            updateUI();
+            showNotification(`+${CONFIG.AD_ENERGY_BONUS} ⚡`, 'success');
+        }, 'energy_info_panel');
+    };
+    
+    // Кнопка "Подождать восстановления"
+    $('energyInfoWait').onclick = () => {
+        $('energyInfoPanel').classList.remove('open');
+        showNotification('⏳ Энергия восстанавливается автоматически!', 'info');
+    };
+
+    // Энергия кончилась
+    $('energyAd').onclick = () => { showAd(() => { addEnergy(CONFIG.AD_ENERGY_BONUS); $('energyPanel').classList.remove('open'); updateUI(); showNotification(`+${CONFIG.AD_ENERGY_BONUS} ⚡`, 'success'); }, 'energy_empty'); };
+    $('energyWait').onclick = () => $('energyPanel').classList.remove('open');
+    $('energyClose').onclick = () => $('energyPanel').classList.remove('open');
+    // Повышение звания
+    $('rankupOk').onclick = () => $('rankupPanel').classList.remove('open');
+    // Тултип «Понятно»
+    $('tipOk').onclick = () => $('tipLayer').classList.remove('open');
+    // Сброс прогресса
+    $('clearProgress').onclick = () => {
+        tgAlert(state.currentLang==='en' ? 'Reset ALL progress?' : 'Сбросить ВЕСЬ прогресс?', (ok) => {
+            if (ok) { clearAllProgress(); location.reload(); }
+        });
+    };
+    
+    // === НОВОЕ: ПОКУПКА ЭНЕРГИИ ЗА МОНЕТЫ ===
+    $('energyBuyCoins20').onclick = () => {
+        const cost = CONFIG.ENERGY_BUY_COINS_20;
+        if (state.coins < cost) {
+            showNotification('❌ Недостаточно монет!', 'error');
+            haptic('error');
+            return;
+        }
+        state.coins -= cost;
+        addEnergy(20);
+        updateUI();
+        updateEnergyInfoPanel();
+        showNotification('✅ +20 ⚡ за ' + cost + ' 🪙', 'success');
+        haptic('success');
+        saveGame();
+    };
+    
+    $('energyBuyCoins50').onclick = () => {
+        const cost = CONFIG.ENERGY_BUY_COINS_50;
+        if (state.coins < cost) {
+            showNotification('❌ Недостаточно монет!', 'error');
+            haptic('error');
+            return;
+        }
+        state.coins -= cost;
+        addEnergy(50);
+        updateUI();
+        updateEnergyInfoPanel();
+        showNotification('✅ +50 ⚡ за ' + cost + ' 🪙', 'success');
+        haptic('success');
+        saveGame();
+    };
+    
+    $('energyBuyCoins100').onclick = () => {
+        const cost = CONFIG.ENERGY_BUY_COINS_100;
+        if (state.coins < cost) {
+            showNotification('❌ Недостаточно монет!', 'error');
+            haptic('error');
+            return;
+        }
+        state.coins -= cost;
+        addEnergy(100);
+        updateUI();
+        updateEnergyInfoPanel();
+        showNotification('✅ +100 ⚡ за ' + cost + ' 🪙', 'success');
+        haptic('success');
+        saveGame();
+    };
+    
+    // === НОВОЕ: ПОКУПКА ЭНЕРГИИ ЗА TELEGRAM STARS ===
+    $('energyBuyStars50').onclick = () => {
+        trackEvent('stars_energy_50_click', {});
+        if (!CONFIG.STARS_INVOICE_URL_ENERGY_50) {
+            showNotification('⚙️ Покупка за Stars скоро будет доступна!', 'error');
+            haptic('error');
+            return;
+        }
+        if (!isTelegram || !TG.openInvoice) {
+            showNotification('⚙️ Доступно только в Telegram!', 'error');
+            return;
+        }
+        try {
+            TG.openInvoice(CONFIG.STARS_INVOICE_URL_ENERGY_50, (status) => {
+                if (status === 'paid') {
+                    addEnergy(50);
+                    state.isPayer = true;
+                    updateUI();
+                    updateEnergyInfoPanel();
+                    showNotification('⭐ +50 ⚡ за 1 Star!', 'success');
+                    haptic('success');
+                    saveGame();
+                }
+            });
+        } catch (e) { 
+            showNotification('⚙️ Ошибка при оплате', 'error'); 
+        }
+    };
+    
+    $('energyBuyStars100').onclick = () => {
+        trackEvent('stars_energy_100_click', {});
+        if (!CONFIG.STARS_INVOICE_URL_ENERGY_100) {
+            showNotification('⚙️ Покупка за Stars скоро будет доступна!', 'error');
+            haptic('error');
+            return;
+        }
+        if (!isTelegram || !TG.openInvoice) {
+            showNotification('⚙️ Доступно только в Telegram!', 'error');
+            return;
+        }
+        try {
+            TG.openInvoice(CONFIG.STARS_INVOICE_URL_ENERGY_100, (status) => {
+                if (status === 'paid') {
+                    addEnergy(100);
+                    state.isPayer = true;
+                    updateUI();
+                    updateEnergyInfoPanel();
+                    showNotification('⭐ +100 ⚡ за 2 Stars!', 'success');
+                    haptic('success');
+                    saveGame();
+                }
+            });
+        } catch (e) { 
+            showNotification('⚙️ Ошибка при оплате', 'error'); 
+        }
+    };
+	    // === ПОКУПКА ЭНЕРГИИ ЗА МОНЕТЫ ===
+    $('energyBuyCoins20').onclick = () => {
+        const cost = CONFIG.ENERGY_BUY_COINS_20;
+        if (state.coins < cost) {
+            showNotification('❌ Недостаточно монет!', 'error');
+            haptic('error');
+            return;
+        }
+        state.coins -= cost;
+        addEnergy(20);
+        updateUI();
+        updateEnergyInfoPanel();
+        showNotification('✅ +20 ⚡ за ' + cost + ' 🪙', 'success');
+        haptic('success');
+        saveGame();
+    };
+    
+    $('energyBuyCoins50').onclick = () => {
+        const cost = CONFIG.ENERGY_BUY_COINS_50;
+        if (state.coins < cost) {
+            showNotification('❌ Недостаточно монет!', 'error');
+            haptic('error');
+            return;
+        }
+        state.coins -= cost;
+        addEnergy(50);
+        updateUI();
+        updateEnergyInfoPanel();
+        showNotification('✅ +50 ⚡ за ' + cost + ' 🪙', 'success');
+        haptic('success');
+        saveGame();
+    };
+    
+    $('energyBuyCoins100').onclick = () => {
+        const cost = CONFIG.ENERGY_BUY_COINS_100;
+        if (state.coins < cost) {
+            showNotification('❌ Недостаточно монет!', 'error');
+            haptic('error');
+            return;
+        }
+        state.coins -= cost;
+        addEnergy(100);
+        updateUI();
+        updateEnergyInfoPanel();
+        showNotification('✅ +100 ⚡ за ' + cost + ' 🪙', 'success');
+        haptic('success');
+        saveGame();
+    };
+    
+    // === ПОКУПКА ЭНЕРГИИ ЗА STARS ===
+    $('energyBuyStars50').onclick = () => {
+        trackEvent('stars_energy_50_click', {});
+        if (!CONFIG.STARS_INVOICE_URL_ENERGY_50) {
+            showNotification('⚙️ Покупка за Stars скоро будет доступна!', 'error');
+            haptic('error');
+            return;
+        }
+        if (!isTelegram || !TG.openInvoice) {
+            showNotification('⚙️ Доступно только в Telegram!', 'error');
+            return;
+        }
+        try {
+            TG.openInvoice(CONFIG.STARS_INVOICE_URL_ENERGY_50, (status) => {
+                if (status === 'paid') {
+                    addEnergy(50);
+                    state.isPayer = true;
+                    updateUI();
+                    updateEnergyInfoPanel();
+                    showNotification('⭐ +50 ⚡ за 1 Star!', 'success');
+                    haptic('success');
+                    saveGame();
+                }
+            });
+        } catch (e) { 
+            showNotification('⚙️ Ошибка при оплате', 'error'); 
+        }
+    };
+    
+    $('energyBuyStars100').onclick = () => {
+        trackEvent('stars_energy_100_click', {});
+        if (!CONFIG.STARS_INVOICE_URL_ENERGY_100) {
+            showNotification('⚙️ Покупка за Stars скоро будет доступна!', 'error');
+            haptic('error');
+            return;
+        }
+        if (!isTelegram || !TG.openInvoice) {
+            showNotification('⚙️ Доступно только в Telegram!', 'error');
+            return;
+        }
+        try {
+            TG.openInvoice(CONFIG.STARS_INVOICE_URL_ENERGY_100, (status) => {
+                if (status === 'paid') {
+                    addEnergy(100);
+                    state.isPayer = true;
+                    updateUI();
+                    updateEnergyInfoPanel();
+                    showNotification('⭐ +100 ⚡ за 2 Stars!', 'success');
+                    haptic('success');
+                    saveGame();
+                }
+            });
+        } catch (e) { 
+            showNotification('⚙️ Ошибка при оплате', 'error'); 
+        }
+    };
+
+/* --- 7.5. Клик по canvas (ход) --- */
+    function handleCanvasClick(clientX, clientY, forceDir) {
+        if (state.solved || state.animating) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = CONFIG.LOGICAL_SIZE / rect.width;
+        const scaleY = CONFIG.LOGICAL_SIZE / rect.height;
+        const x = (clientX - rect.left) * scaleX;
+        const y = (clientY - rect.top) * scaleY;
+        let target = null, minD = Infinity;
+        state.gears.forEach((g, i) => { const d = Math.hypot(g.x-x, g.y-y); if (d < minD) { minD = d; target = i; } });
+        if (target === null || minD > CONFIG.CLICK_RADIUS * 1.6) return;
+        const gear = state.gears[target];
+        const dir = forceDir || ((x > gear.x) ? 'cw' : 'ccw');
+        moveSound(); makeMove(target, dir);
+        maybeShowEnergyTip(); maybeShowCoinsTip();
+    }
+    canvas.addEventListener('click', (e) => handleCanvasClick(e.clientX, e.clientY));
+    canvas.addEventListener('contextmenu', (e) => { e.preventDefault(); handleCanvasClick(e.clientX, e.clientY, 'cw'); });
+
+      /* --- 7.6. Таймер восстановления энергии (обновление шапки) --- */
+    setInterval(() => { 
+        regenEnergy(); 
+        $('energy').textContent = Math.floor(state.energy); 
+        if ($('energyPanel').classList.contains('open')) updateEnergyTimer(); 
+        if ($('energyInfoPanel').classList.contains('open')) updateEnergyInfoPanel(); 
+    }, 1000);
+    /* --- 7.7. Остановка анимаций при уходе со вкладки (экономия батареи) --- */
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) { stopWinAnimation(); }
+        else { draw(); }
+    });
+
+    /* --- 7.8. Читы (только TEST_MODE) --- */
+    if (CONFIG.TEST_MODE) {
+        window.unlockAll = () => { state.unlocked = 40; saveGame(); renderLevels(); console.log('✅ Все уровни открыты'); };
+        window.lockAll = () => { state.unlocked = 1; state.bestScores={}; state.bestStars={}; state.totalLevelsCompleted=0; saveGame(); renderLevels(); console.log('🔒 Прогресс сброшен'); };
+        window.addCoins = (n=500) => { state.coins += n; saveGame(); updateProfile(); console.log(`+${n} монет`); };
+        window.addEnergy = (n=100) => { addEnergy(n); updateUI(); console.log(`+${n} энергии`); };
+        console.log('🧪 TEST_MODE: unlockAll() | lockAll() | addCoins(n) | addEnergy(n)');
+    }
+
+/* --- 7.9. Запуск игры --- */
+    loadGame((saved) => {
+        if (saved) applySaveData(saved);
+        regenEnergy();
+        setupCanvas();
+        applyLanguage();
+        updateProfile();
+        updateStartRank();
+        renderDailyGrid();
+        // авто-показ ежедневного бонуса при входе (если не забран сегодня)
+        const today = new Date().toDateString();
+        if (state.lastDailyClaim !== today) {
+            setTimeout(() => { renderDailyGrid(); $('dailyPanel').classList.add('open'); showTip('first_daily'); }, 600);
+        }
+        // отправка свойств игрока в Метрику
+        trackEvent('game_start', { source: getStartParam(), platform: detectPlatform(), lang: state.currentLang, rank: getRank().key });
+         draw();
+        renderLevels();
+    });
+
+    /* --- 7.10. Отображение таблицы званий (с локализацией) --- */
+    function renderRanksTable() {
+        const container = $('ranksTable');
+        if (!container) return;
+        
+        let html = `<table class="rank-table">
+            <thead>
+                <tr>
+                    <th>${t('ranksTableHeadRank')}</th>
+                    <th>${t('ranksTableHeadCoins')}</th>
+                    <th>${t('ranksTableHeadEnergy')}</th>
+                    <th>${t('ranksTableHeadPriv')}</th>
+                    <th>${t('ranksTableHeadStatus')}</th>
+                </tr>
+            </thead>
+            <tbody>`;
+        
+        CONFIG.RANKS.forEach(rank => {
+            const unlocked = state.coins >= rank.threshold;
+            const isCurrent = getRank().key === rank.key;
+            
+            let status = t('ranksStatusLocked');
+            if (unlocked) status = t('ranksStatusUnlocked');
+            else if (getNextRank() && getNextRank().key === rank.key) status = t('ranksStatusNext');
+            
+            let bonusText = [];
+            if (rank.freeHints > 0) {
+                bonusText.push(`${rank.freeHints} ${t('ranksPrivFreeHints')}`);
+            }
+            if (rank.secondChance) {
+                bonusText.push(t('ranksPrivSecondChance'));
+            }
+            if (rank.coinBonus > 0) {
+                bonusText.push(`+${Math.round(rank.coinBonus*100)}% ${t('ranksPrivCoinBonus')}`);
+            }
+            if (rank.discount > 0) {
+                bonusText.push(`-${Math.round(rank.discount*100)}% ${t('ranksPrivDiscount')}`);
+            }
+            
+            const bonusStr = bonusText.length > 0 ? bonusText.join(', ') : '—';
+            const thresholdText = rank.threshold > 0 ? rank.threshold : t('ranksStatusStart');
+            
+            html += `<tr class="${isCurrent ? 'current-rank' : ''}" style="${unlocked ? 'opacity:1;' : 'opacity:0.6;'}">
+                <td>${rank.icon} ${rankName(rank)}</td>
+                <td>${thresholdText}</td>
+                <td>${rank.maxEnergy}</td>
+                <td style="font-size:11px;">${bonusStr}</td>
+                <td>${status}</td>
+            </tr>`;
+        });
+        
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+    }
+
+    </script>
+</body>
+</html>
